@@ -20,7 +20,9 @@ namespace Ship.AI.Order
 
         public bool Execute(ShipBody ship)
         {
-            var deltaAngle = _targetDirection - ship.Rotation.eulerAngles.y;
+            var forward = ship.Rotation * Vector3.forward;
+            var direction = Quaternion.Euler(0, _targetDirection, 0) * Vector3.forward;
+            var deltaAngle = Vector3.SignedAngle(forward, direction, Vector3.up);
             deltaAngle *= 2f;//rotation effectiveness?
             deltaAngle = Mathf.Clamp(deltaAngle, -45, 45);
             
@@ -30,7 +32,9 @@ namespace Ship.AI.Order
 
         public bool Simulate(ManeuverContext context, float deltaTime)
         {
-            var deltaAngle = _targetDirection - context.Self.PhysicsData.Rotation.eulerAngles.y;
+            var forward = context.Self.PhysicsData.Rotation * Vector3.forward;
+            var direction = Quaternion.Euler(0, _targetDirection, 0) * Vector3.forward;
+            var deltaAngle = Vector3.SignedAngle(forward, direction, Vector3.up);
             deltaAngle *= 2f;//rotation effectiveness?
             deltaAngle = Mathf.Clamp(deltaAngle, -45, 45);
 

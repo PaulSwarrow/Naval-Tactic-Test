@@ -1,4 +1,5 @@
-﻿using Ship.AI.Data;
+﻿using System;
+using Ship.AI.Data;
 using Ship.Data;
 using UnityEngine;
 
@@ -6,48 +7,65 @@ namespace Ship
 {
     public static class ShipPhysics
     {
-        public static (Vector3 linear, Vector3 angularForce) CalculateForces(ShipPhysicsData physics, ShipSteeringData steering, ShipRigData rigging, Vector3 wind)
+        public static (Vector3 linear, Vector3 angular) CalculateForces(ShipPhysicsData physics, ShipSteeringData steering, ShipRigData rigging, Vector3 wind)
         {
             var shipDirection = physics.Rotation * Vector3.forward;
             var velocity = physics.Velocity;
-            var angularVelocity = physics.AngularVelocity;
             var force = Vector3.zero;
             
-
             rigging.ForeachSail(sail =>
             {
                 var vector = Quaternion.Euler(0, sail.Angle, 0) * shipDirection;
-                var dotProduct = Vector3.Dot(vector, wind.normalized);
-                var sailForce = vector * (wind.magnitude * dotProduct);
-                force += sailForce;
+                force += vector * (sail.Input * sail.Setup);
             });
             
             var right = physics.Rotation * Vector3.right;
-            var keelDotProduct = Vector3.Dot(right, velocity);
-            var keelResistance = right * (keelDotProduct * 0.9f); //TODO magic number for keel drag force!
-            force -= keelResistance;
-
-            var back = -shipDirection;
-            var sternDotProduct = Mathf.Max(Vector3.Dot(back, velocity), 0);
-            var sternResistance = back * (sternDotProduct * 0.99f);
-            force -= sternResistance;
-
+            
+            var forceForward = shipDirection * (Vector3.Dot(force, shipDirection));
+            //var forceRight = right * (Vector3.Dot(force, right) * 0.25f);
+            //force = forceForward + forceRight;
+            force = forceForward;//no side shifting at all - simplifies AI
+            
             var steeringForce = Vector3.Dot(shipDirection, velocity) * steering.Angle * steering.Efficiency;
             var angularForce = new Vector3(0, steeringForce , 0);
             
 
-            return (linear: force, angularForce: angularForce);
+            return (linear: force, angular: angularForce);
         }
 
-        public delegate void SailHandler(ShipRigSailsData sailData);
-
-        public static void ForeachSail(this ShipRigData data, SailHandler handler)
+        public static Vector3 CalculateHullDrag(ShipPhysicsData physics)
         {
-            //TODO check existence
-            handler.Invoke(data.MainSail);
-            handler.Invoke(data.MiddleSail);
-            handler.Invoke(data.MizzenSail);
-            handler.Invoke(data.GafSail);
+            var acceleration = Vector3.zero;
+            var right = physics.Rotation * Vector3.right;
+            var keelDotProduct = Vector3.Dot(right, physics.Velocity);
+            var keelResistance = right * (keelDotProduct * physics.KeelDrag); //TODO magic number for keel drag force!
+            acceleration -= keelResistance;
+            
+            var back = -(physics.Rotation * Vector3.forward);
+            var sternDotProduct = Mathf.Max(Vector3.Dot(back, physics.Velocity), 0);
+            var sternResistance = back * (sternDotProduct * 0.99f);
+            acceleration -= sternResistance;
+
+            return acceleration;
         }
+
+        public static void UpdateWindInput(ref ShipRigData data, Vector3 shipDirection, Vector3 wind)
+        {
+            SailSlot[] sailSlots = (SailSlot[])Enum.GetValues(typeof(SailSlot));
+
+            // Iterate through the enum values
+            foreach (SailSlot slot in sailSlots)
+            {
+                //TODO self shadowing
+                var sail = data[slot];
+                var vector = Quaternion.Euler(0, sail.Angle, 0) * shipDirection;
+                var dotProduct = Vector3.Dot(vector, wind.normalized);
+                sail.Input = wind.magnitude * dotProduct;
+                data[slot] = sail;
+            }
+        }
+
+        
+        
     }
 }

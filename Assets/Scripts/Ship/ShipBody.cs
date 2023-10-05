@@ -49,12 +49,17 @@ namespace Ship
             var self = transform;
             var wind = _windSystem.GetWind(self.position); //assumption that wind doesn't change during time!
             var physicsData = GetPhysicsData();
+            
+            ShipPhysics.UpdateWindInput(ref _rigData, self.forward, wind);
             var forces = ShipPhysics.CalculateForces(physicsData, _steering, _rigData, wind);
+            var deceleration = ShipPhysics.CalculateHullDrag(physicsData);
+            
+            _body.AddForce(deceleration, ForceMode.Acceleration);
             //add linear force
             _body.AddForce(forces.linear);
             
             //add angular force manually
-            Vector3 angularAcceleration = (forces.angularForce - _angularVelocity * _body.angularDrag) / _body.inertiaTensor.magnitude;
+            Vector3 angularAcceleration = (forces.angular - _angularVelocity * _body.angularDrag) / _body.inertiaTensor.magnitude;
             Vector3 averageAngularVelocity = _angularVelocity + angularAcceleration * (t / 2);
             _angularVelocity = _angularVelocity + angularAcceleration * t;
             Quaternion rotationChange = Quaternion.Euler(averageAngularVelocity * t);
@@ -81,6 +86,7 @@ namespace Ship
                 AngularVelocity = _angularVelocity,
                 Drag = _body.drag,
                 AngularDrag = _body.angularDrag,
+                KeelDrag = _keelDrag,
                 Mass = _body.mass,
                 InertiaTensor = _body.inertiaTensor.magnitude
             };
@@ -95,6 +101,11 @@ namespace Ship
         public void TurnWheel(float angle)
         {
             _steering.Angle = angle;
+        }
+
+        public ShipSailData GetSailInfo(SailSlot sail)
+        {
+           return _rigData[sail];
         }
     }
 }

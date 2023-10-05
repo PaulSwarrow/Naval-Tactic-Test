@@ -39,5 +39,6 @@ namespace Ship.AI.Data
         public float InertiaTensor;
         public float Drag;
         public float AngularDrag;
+        public float KeelDrag;
     }
 }

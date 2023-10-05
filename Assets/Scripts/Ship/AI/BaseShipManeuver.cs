@@ -39,10 +39,12 @@ namespace Ship.AI
             for (; context.Time < endTime; context.Time += deltaTime)
             {
                 var wind = _windSystem.GetWind(body.Position); //assumption that wind doesn't change during time!
+                ShipPhysics.UpdateWindInput(ref context.Self.RigData, body.Rotation * Vector3.forward ,wind);
                 var forces = ShipPhysics.CalculateForces(body, context.Self.Steering, context.Self.RigData, wind);
-
+                
+                var deceleration = ShipPhysics.CalculateHullDrag(body);
                 // Calculate the acceleration due to drag force
-                Vector3 acceleration = (forces.linear - body.Velocity * body.Drag) / body.Mass;
+                Vector3 acceleration = (forces.linear - body.Velocity * body.Drag) / body.Mass + deceleration;
                 // Calculate the new velocity after timeToPredict
                 Vector3 newVelocity = body.Velocity + acceleration * deltaTime;
                 // Calculate the new position after timeToPredict
@@ -51,7 +53,7 @@ namespace Ship.AI
 
                 // Calculate the angular acceleration due to angular force
                 Vector3 angularAcceleration =
-                    (forces.angularForce - body.AngularVelocity * body.AngularDrag) / body.InertiaTensor;
+                    (forces.angular - body.AngularVelocity * body.AngularDrag) / body.InertiaTensor;
                 // Calculate the average angular velocity over the time interval
                 Vector3 averageAngularVelocity = body.AngularVelocity + angularAcceleration * (deltaTime / 2);
                 // Update the angular velocity using angular acceleration
