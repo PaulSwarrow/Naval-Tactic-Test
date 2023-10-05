@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ship.Data;
+using Ship.Interfaces;
 using UnityEngine;
 
 namespace Ship.AI.Data
@@ -10,6 +11,9 @@ namespace Ship.AI.Data
         public float Time;
         public List<IShipOrder> ActiveOrders = new List<IShipOrder>();
         public AIPredictionShipData Self;
+
+        public IWindProvider Wind;
+        public IDepthProvider Depth;
     }
 
     [Serializable]

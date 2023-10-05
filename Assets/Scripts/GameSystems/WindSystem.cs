@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Ship.Interfaces;
+using UnityEngine;
 
 namespace DefaultNamespace.GameSystems
 {
-    public class WindSystem : MonoBehaviour
+    public class WindSystem : MonoBehaviour, IWindProvider
     {
         [SerializeField]
         private float _direction;

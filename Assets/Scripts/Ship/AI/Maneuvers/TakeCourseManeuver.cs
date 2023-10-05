@@ -16,7 +16,7 @@ namespace Ship.AI.Maneuvers
 
         protected override void DoCalculation(ManeuverContext context, ManeuverPrediction result)
         {
-            CheckPoint(context, result, SteeringOrder.KeepCourse(targetAngle));
+            CheckPoint(context, result, SteeringOrders.KeepCourse(targetAngle));
             
             //DO orders
             FastForward(3, context);

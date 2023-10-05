@@ -6,7 +6,7 @@ namespace Ship.OrdersManagement
     public enum ShipOrderCategory
     {
         None, //for debug
-        Rig, //square sails
+        Sails, //square sails
         Steer, //also includes spanker and jibs rigging
         Guns,
         //etc

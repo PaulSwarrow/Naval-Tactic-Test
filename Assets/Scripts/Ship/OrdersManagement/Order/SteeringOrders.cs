@@ -4,18 +4,19 @@ using UnityEngine;
 
 namespace Ship.AI.Order
 {
-    public class SteeringOrder : IShipOrder
+    public class SteeringOrders : IShipOrder
     {
-        public SteeringOrder(float targetDirection)
-        {
-            this._targetDirection = targetDirection;
-        }
 
-        public static IShipOrder KeepCourse(float direction) => new SteeringOrder(direction);
+        public static IShipOrder KeepCourse(float direction) => new SteeringOrders(direction);
+        
         
 
         private float _targetDirection;
 
+        private SteeringOrders(float targetDirection)
+        {
+            this._targetDirection = targetDirection;
+        }
         public ShipOrderCategory Category => ShipOrderCategory.Steer;
 
         public bool Execute(ShipBody ship)

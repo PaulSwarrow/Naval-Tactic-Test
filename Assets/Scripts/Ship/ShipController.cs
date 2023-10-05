@@ -34,6 +34,7 @@ namespace Ship
 
         private void Update()
         {
+            
             _activeOrders.ForeachOrder(order =>
             {
                 if (order.Execute(_body)) _activeOrders.RemoveOrder(order);
@@ -45,12 +46,10 @@ namespace Ship
         { 
             var context = new ManeuverContext()
             {
-                Self = _body.ExportToAI()
+                Self = _body.ExportToAI(),
+                Wind = _windSystem
             };
-            var maneuver = new TakeCourseManeuver(45)
-            {
-                _windSystem = _windSystem
-            };
+            var maneuver = new TakeCourseManeuver(0);
             _prediction = maneuver.Calculate(context);
             await ExecuteManeuver(_prediction);
         }

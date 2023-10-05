@@ -107,5 +107,14 @@ namespace Ship
         {
            return _rigData[sail];
         }
+
+        //TODO 
+        public void SetupSail(SailSlot slot, int value, float angle)
+        {
+            var sail = _rigData[slot];
+            sail.Setup = value;
+            sail.Angle = angle;
+            _rigData[slot] = sail;
+        }
     }
 }

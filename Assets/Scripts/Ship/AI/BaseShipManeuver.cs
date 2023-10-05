@@ -7,9 +7,6 @@ namespace Ship.AI
 {
     public abstract class BaseShipManeuver
     {
-        public WindSystem _windSystem;
-
-
         public ManeuverPrediction Calculate(ManeuverContext context)
         {
             var result = new ManeuverPrediction();
@@ -38,7 +35,7 @@ namespace Ship.AI
             var endTime = context.Time + seconds;
             for (; context.Time < endTime; context.Time += deltaTime)
             {
-                var wind = _windSystem.GetWind(body.Position); //assumption that wind doesn't change during time!
+                var wind = context.Wind.GetWind(body.Position); //assumption that wind doesn't change during time!
                 ShipPhysics.UpdateWindInput(ref context.Self.RigData, body.Rotation * Vector3.forward ,wind);
                 var forces = ShipPhysics.CalculateForces(body, context.Self.Steering, context.Self.RigData, wind);
                 
