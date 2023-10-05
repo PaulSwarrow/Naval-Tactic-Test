@@ -23,6 +23,7 @@ namespace Ship.AI.Data
         [HideInInspector]
         public ShipRigData RigData;
         public ShipSteeringData Steering;
+        public WorldDirection RelativeWind;
     }
 
     [Serializable]
@@ -44,5 +45,6 @@ namespace Ship.AI.Data
         public float Drag;
         public float AngularDrag;
         public float KeelDrag;
+        public Vector3 Forward => Rotation * Vector3.forward;
     }
 }

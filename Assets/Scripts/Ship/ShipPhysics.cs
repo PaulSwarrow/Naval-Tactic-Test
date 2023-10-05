@@ -65,6 +65,26 @@ namespace Ship
             }
         }
 
+        public static WorldDirection GetRelativeWind(Vector3 wind, Vector3 shipForward)
+        {
+            var angle = Vector3.SignedAngle(shipForward, wind, Vector3.up);
+            var angleInt = Mathf.RoundToInt(angle / 45);
+            switch (angleInt)
+            {
+                case 0 : return WorldDirection.N;
+                case 1 : return WorldDirection.NE;
+                case 2 : return WorldDirection.E;
+                case 3 : return WorldDirection.SE;
+                case 4:
+                case -4: return WorldDirection.S;
+                case -1: return WorldDirection.NW;
+                case -2: return WorldDirection.W;
+                case -3: return WorldDirection.SW;
+                default: throw new Exception($"Wrong wind angle: {angle}");
+            }
+            
+        }
+
         
         
     }

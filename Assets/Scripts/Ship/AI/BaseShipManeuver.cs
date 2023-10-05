@@ -63,6 +63,7 @@ namespace Ship.AI
                 body.Velocity = newVelocity;
                 body.Rotation = newRotation;
                 body.AngularVelocity = newAngularVelocity;
+                context.Self.RelativeWind = ShipPhysics.GetRelativeWind(wind, body.Forward);
                 context.Self.PhysicsData = body;
 
                 for (int i = context.ActiveOrders.Count - 1; i >= 0; i--)

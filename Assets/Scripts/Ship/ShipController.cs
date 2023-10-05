@@ -41,6 +41,8 @@ namespace Ship
                 
             });
         }
+        
+        
 
         private async UniTask TEST()
         { 
@@ -49,7 +51,7 @@ namespace Ship
                 Self = _body.ExportToAI(),
                 Wind = _windSystem
             };
-            var maneuver = new TakeCourseManeuver(0);
+            var maneuver = new TakeCourseManeuver(Vector3.forward);
             _prediction = maneuver.Calculate(context);
             await ExecuteManeuver(_prediction);
         }

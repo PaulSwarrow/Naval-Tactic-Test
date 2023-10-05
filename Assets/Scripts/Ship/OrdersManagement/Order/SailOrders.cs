@@ -9,17 +9,14 @@ namespace Ship.AI.Order
 {
     public class SailOrder : IShipOrder
     {
-        public IShipOrder JibRight() => new SailOrder(SailSlot.FrontJib, 1, 45);
-        public IShipOrder JibLeft() => new SailOrder(SailSlot.FrontJib, 1, 135);
-        public IShipOrder SpankerRight() => new SailOrder(SailSlot.FrontJib, 1, 45);
-        public IShipOrder SpankerLeft() => new SailOrder(SailSlot.FrontJib, 1, 135);
-
-
-        public IShipOrder Up(SailSlot slot) => new SailOrder(slot, 1);
-        public IShipOrder Down(SailSlot slot) => new SailOrder(slot, 0);
-
-
-        public IEnumerable<IShipOrder> TurnRight(WorldDirection windRelative)
+        public static IShipOrder JibRight() => new SailOrder(SailSlot.FrontJib, 1, 45);
+        public static IShipOrder JibLeft() => new SailOrder(SailSlot.FrontJib, 1, 135);
+        public static IShipOrder SpankerRight() => new SailOrder(SailSlot.FrontJib, 1, 45);
+        public static IShipOrder SpankerLeft() => new SailOrder(SailSlot.FrontJib, 1, 135);
+        public static IShipOrder Up(SailSlot slot) => new SailOrder(slot, 1);
+        public static IShipOrder Down(SailSlot slot) => new SailOrder(slot, 0);
+        
+        public static IEnumerable<IShipOrder> TurnRight(WorldDirection windRelative)
         {
             var result = new List<IShipOrder>();
             
@@ -61,7 +58,9 @@ namespace Ship.AI.Order
             }
 
             return result;
-        }public IEnumerable<IShipOrder> TurnLeft(WorldDirection windRelative)
+        }
+        
+        public static IEnumerable<IShipOrder> TurnLeft(WorldDirection windRelative)
         {
             var result = new List<IShipOrder>();
             
@@ -107,9 +106,9 @@ namespace Ship.AI.Order
 
         private SailSlot _sailSlot;
         private int _setup;
-        public int _angle;
+        private int _angle;
 
-        public SailOrder(SailSlot sailSlot, int setup, int angle = 0)
+        private SailOrder(SailSlot sailSlot, int setup, int angle = 0)
         {
             _sailSlot = sailSlot;
             _setup = setup;
