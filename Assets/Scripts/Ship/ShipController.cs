@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using DefaultNamespace.GameSystems;
 using Ship.AI;
 using Ship.AI.Data;
 using Ship.AI.Maneuvers;
+using Ship.AI.Order;
+using Ship.Data;
 using Ship.OrdersManagement;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
 
@@ -29,7 +33,7 @@ namespace Ship
 
         private void Start()
         {
-            TEST().Forget();
+            //TEST().Forget();
         }
 
         private void Update()
@@ -41,8 +45,26 @@ namespace Ship
                 
             });
         }
-        
-        
+
+        [Button]
+        private void SailsTurnRight()
+        {
+            var wind = ShipPhysics.GetRelativeWind(_windSystem.GetWind(transform.position), transform.forward);
+            Debug.Log(wind);
+            _activeOrders.AddRange(SailOrder.TurnRight(wind).ToArray());
+        }
+        [Button]
+        private void SailsTurnLeft()
+        {
+            var wind = ShipPhysics.GetRelativeWind(_windSystem.GetWind(transform.position), transform.forward);
+            Debug.Log(wind);
+            _activeOrders.AddRange(SailOrder.TurnLeft(wind).ToArray());
+        }
+        [Button]
+        private void SailDown()
+        {
+            _activeOrders.AddRange(SailOrder.Down(SailSlot.FrontJib), SailOrder.Down(SailSlot.Gaf));
+        }
 
         private async UniTask TEST()
         { 

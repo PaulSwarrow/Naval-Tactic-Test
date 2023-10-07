@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Ship.AI;
+using UnityEngine;
 
 namespace Ship.OrdersManagement
 {
@@ -19,13 +20,19 @@ namespace Ship.OrdersManagement
         
         public void AddOrder(IShipOrder order)
         {
-            ForeachOrder(a =>
+            //TODO diff handlers for dif categories?
+            if (order.Category != ShipOrderCategory.Sails)
             {
-                if ((a.Category & order.Category) != ShipOrderCategory.None)
+                ForeachOrder(a =>
                 {
-                    RemoveOrder(order);//TODO mention cause?
-                }
-            });
+                    if ((a.Category & order.Category) != ShipOrderCategory.None)
+                    {
+                        RemoveOrder(order); //TODO mention cause?
+                    }
+                });
+            }
+
+            Debug.Log($"Add order: {order}");
             _activeOrders.Add(order);
 
         }

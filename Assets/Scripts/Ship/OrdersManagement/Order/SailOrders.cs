@@ -11,8 +11,8 @@ namespace Ship.AI.Order
     {
         public static IShipOrder JibRight() => new SailOrder(SailSlot.FrontJib, 1, 45);
         public static IShipOrder JibLeft() => new SailOrder(SailSlot.FrontJib, 1, 135);
-        public static IShipOrder SpankerRight() => new SailOrder(SailSlot.FrontJib, 1, 45);
-        public static IShipOrder SpankerLeft() => new SailOrder(SailSlot.FrontJib, 1, 135);
+        public static IShipOrder SpankerRight() => new SailOrder(SailSlot.Gaf, 1, 45);
+        public static IShipOrder SpankerLeft() => new SailOrder(SailSlot.Gaf, 1, 135);
         public static IShipOrder Up(SailSlot slot) => new SailOrder(slot, 1);
         public static IShipOrder Down(SailSlot slot) => new SailOrder(slot, 0);
         
@@ -24,14 +24,12 @@ namespace Ship.AI.Order
             switch (windRelative)
             {
                 case WorldDirection.N:
-                case WorldDirection.NE:
-                case WorldDirection.E:
-                    result.Add(Up(SailSlot.Gaf));
+                case WorldDirection.NW:
+                case WorldDirection.W:
                     result.Add(SpankerLeft());
                     break;
-                case WorldDirection.SE:
+                case WorldDirection.SW:
                 case WorldDirection.S:
-                    result.Add(Up(SailSlot.Gaf));
                     result.Add(SpankerRight());
                     break;
                 default:
@@ -42,15 +40,13 @@ namespace Ship.AI.Order
             switch (windRelative)
             {
                 case WorldDirection.N:
-                case WorldDirection.NW:
-                case WorldDirection.W:
-                    result.Add(Up(SailSlot.FrontJib));
-                    result.Add(SpankerRight());
+                case WorldDirection.NE:
+                case WorldDirection.E:
+                    result.Add(JibRight());
                     break;
-                case WorldDirection.SW:
+                case WorldDirection.SE:
                 case WorldDirection.S:
-                    result.Add(Up(SailSlot.FrontJib));
-                    result.Add(SpankerLeft());
+                    result.Add(JibLeft());
                     break;
                 default:
                     result.Add(Down(SailSlot.FrontJib));
@@ -68,14 +64,12 @@ namespace Ship.AI.Order
             switch (windRelative)
             {
                 case WorldDirection.N:
-                case WorldDirection.NW:
-                case WorldDirection.W:
-                    result.Add(Up(SailSlot.Gaf));
+                case WorldDirection.NE:
+                case WorldDirection.E:
                     result.Add(SpankerRight());
                     break;
-                case WorldDirection.SW:
+                case WorldDirection.SE:
                 case WorldDirection.S:
-                    result.Add(Up(SailSlot.Gaf));
                     result.Add(SpankerLeft());
                     break;
                 default:
@@ -86,15 +80,13 @@ namespace Ship.AI.Order
             switch (windRelative)
             {
                 case WorldDirection.N:
-                case WorldDirection.NE:
-                case WorldDirection.E:
-                    result.Add(Up(SailSlot.FrontJib));
-                    result.Add(SpankerLeft());
+                case WorldDirection.NW:
+                case WorldDirection.W:
+                    result.Add(JibLeft());
                     break;
-                case WorldDirection.SE:
+                case WorldDirection.SW:
                 case WorldDirection.S:
-                    result.Add(Up(SailSlot.FrontJib));
-                    result.Add(SpankerRight());
+                    result.Add(JibRight());
                     break;
                 default:
                     result.Add(Down(SailSlot.FrontJib));
@@ -106,7 +98,7 @@ namespace Ship.AI.Order
 
         private SailSlot _sailSlot;
         private int _setup;
-        private int _angle;
+        public int _angle;
 
         private SailOrder(SailSlot sailSlot, int setup, int angle = 0)
         {
@@ -130,6 +122,11 @@ namespace Ship.AI.Order
         }
 
         public ShipOrderCategory Category => ShipOrderCategory.Sails;
+
+        public override string ToString()
+        {
+            return $"[SailOrder_{_sailSlot}_{_setup}_{_angle}";
+        }
     }
     
     

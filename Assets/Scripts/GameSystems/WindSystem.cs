@@ -9,6 +9,8 @@ namespace DefaultNamespace.GameSystems
         private float _direction;
 
         [SerializeField] private float _force = 1;
+        public float Angle => _direction;
+
         public Vector3 GetWind(Vector3 position) => Quaternion.Euler(0, _direction, 0) * Vector3.forward * _force;
     }
 }
