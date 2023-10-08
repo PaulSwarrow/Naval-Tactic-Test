@@ -16,7 +16,7 @@ namespace Ship.Data
     [Serializable]
     public struct ShipRigData
     {
-        public delegate void SailHandler(ShipSailData sailData);
+        public delegate void SailHandler(SailSlot slot, ShipSailData sailData);
 
         public ShipSailData FrontJib;
         public ShipSailData MainSail;
@@ -24,17 +24,18 @@ namespace Ship.Data
         public ShipSailData MiddleJib;
         public ShipSailData MizzenSail;
         public ShipSailData GafSail;
+        public float SteeringEfficiency;
 
 
         public void ForeachSail(SailHandler handler)
         {
             //TODO check existence
-            handler.Invoke(FrontJib);
-            handler.Invoke(MiddleJib);
-            handler.Invoke(MainSail);
-            handler.Invoke(MiddleSail);
-            handler.Invoke(MizzenSail);
-            handler.Invoke(GafSail);
+            handler.Invoke(SailSlot.FrontJib, FrontJib);
+            handler.Invoke(SailSlot.MiddleJib, MiddleJib);
+            handler.Invoke(SailSlot.MainSail, MainSail);
+            handler.Invoke(SailSlot.MiddleSail, MiddleSail);
+            handler.Invoke(SailSlot.MizzenSail, MizzenSail);
+            handler.Invoke(SailSlot.Gaf, GafSail);
         }
 
         public ShipSailData this[SailSlot key]

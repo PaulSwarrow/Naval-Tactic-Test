@@ -157,6 +157,7 @@ MonoBehaviour:
       Angle: 0
       Setup: 0
       Input: 0
+    SteeringEfficiency: 5
   _steering:
     Angle: 0
     Efficiency: 0

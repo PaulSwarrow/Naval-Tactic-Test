@@ -10,27 +10,33 @@ namespace Ship
         public static (Vector3 linear, Vector3 angular) CalculateForces(ShipPhysicsData physics, ShipSteeringData steering, ShipRigData rigging, Vector3 wind)
         {
             var shipDirection = physics.Rotation * Vector3.forward;
+            var right = physics.Rotation * Vector3.right;
             var velocity = physics.Velocity;
-            var force = Vector3.zero;
+            var totalForce = Vector3.zero;
+
+            var steeringForce = 0f;
             
-            rigging.ForeachSail(sail =>
+            rigging.ForeachSail((type, sail) =>
             {
                 var vector = Quaternion.Euler(0, sail.Angle, 0) * shipDirection;
-                force += vector * (sail.Input * sail.Setup);
+                var force = vector * (sail.Input * sail.Setup);
+                totalForce += force;
+                var forceRight = Vector3.Dot(force, right);
+                if (type == SailSlot.FrontJib) steeringForce += forceRight * rigging.SteeringEfficiency;
+                if (type == SailSlot.Gaf) steeringForce -= forceRight * rigging.SteeringEfficiency;
             });
             
-            var right = physics.Rotation * Vector3.right;
             
-            var forceForward = shipDirection * (Vector3.Dot(force, shipDirection));
+            var forceForward = shipDirection * (Vector3.Dot(totalForce, shipDirection));
             //var forceRight = right * (Vector3.Dot(force, right) * 0.25f);
             //force = forceForward + forceRight;
-            force = forceForward;//no side shifting at all - simplifies AI
+            totalForce = forceForward;//no side shifting at all - simplifies AI
             
-            var steeringForce = Vector3.Dot(shipDirection, velocity) * steering.Angle * steering.Efficiency;
+            steeringForce +=Vector3.Dot(shipDirection, velocity) * steering.Angle * steering.Efficiency;
             var angularForce = new Vector3(0, steeringForce , 0);
             
 
-            return (linear: force, angular: angularForce);
+            return (linear: totalForce, angular: angularForce);
         }
 
         public static Vector3 CalculateHullDrag(ShipPhysicsData physics)
