@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using DefaultNamespace.Utils.MissingNetClasses;
-using UnityEngine.AI;
 
 namespace Ship.AI.CommandsGraphSearch
 {
@@ -33,7 +32,7 @@ namespace Ship.AI.CommandsGraphSearch
                     if (!costSoFar.ContainsKey(edge.Destination) || newCost < costSoFar[edge.Destination])
                     {
                         costSoFar[edge.Destination] = newCost;
-                        int priority = newCost; // In a more complex scenario, you might use a heuristic here
+                        int priority = Heuristic(edge.Destination, newCost);
                         frontier.Enqueue(edge.Destination, priority);
                         cameFrom[edge.Destination] = current;
                     }
@@ -44,7 +43,7 @@ namespace Ship.AI.CommandsGraphSearch
             return null;
         }
 
-        private float Heuristic(ManeuverNode node)
+        private int Heuristic(ManeuverNode node, int cost)
         {
             //lesser - more priority
             return 1;
