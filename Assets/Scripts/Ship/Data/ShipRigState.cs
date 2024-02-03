@@ -89,4 +89,10 @@ namespace Ship.Data
             return relativeWind.magnitude * dotProduct;
         }
     }
+
+    [Serializable]
+    public struct ShipSteeringState
+    {
+        public int Angle;
+    }
 }

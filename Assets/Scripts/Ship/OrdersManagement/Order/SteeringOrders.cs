@@ -40,7 +40,7 @@ namespace Ship.AI.Order
             deltaAngle = Mathf.Clamp(deltaAngle, -45, 45);
 
             //TODO simulate update
-            context.Self.Steering.Angle = deltaAngle;
+            context.Self.Steering.Angle = (int)deltaAngle;
             return false;
         }
     }

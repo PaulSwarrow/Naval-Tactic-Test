@@ -7,7 +7,7 @@ namespace Ship
 {
     public static class ShipPhysics
     {
-        public static (Vector3 linear, Vector3 angular) CalculateForces(ShipPhysicsData physics, ShipSteeringData steering, ShipRigState rigging, Vector3 wind)
+        public static (Vector3 linear, Vector3 angular) CalculateForces(ShipPhysicsData physics, ShipSteeringState steering, ShipRigState rigging, Vector3 wind)
         {
             var shipDirection = physics.Rotation * Vector3.forward;
             var right = physics.Rotation * Vector3.right;
@@ -33,7 +33,7 @@ namespace Ship
             //force = forceForward + forceRight;
             totalForce = forceForward;//no side shifting at all - simplifies AI
             
-            steeringForce +=Vector3.Dot(shipDirection, velocity) * steering.Angle * steering.Efficiency;
+            steeringForce +=Vector3.Dot(shipDirection, velocity) * steering.Angle * 50;
             var angularForce = new Vector3(0, steeringForce , 0);
             
 

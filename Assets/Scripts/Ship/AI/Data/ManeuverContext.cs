@@ -23,15 +23,8 @@ namespace Ship.AI.Data
         public ShipPhysicsData PhysicsData;
         [HideInInspector]
         public ShipRigState RigState;
-        public ShipSteeringData Steering;
+        public ShipSteeringState Steering;
         public WorldDirection RelativeWind;
-    }
-
-    [Serializable]
-    public struct ShipSteeringData
-    {
-        public float Angle;
-        public float Efficiency;
     }
     
     [Serializable]

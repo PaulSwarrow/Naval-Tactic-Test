@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18031943, g: 0.22575907, b: 0.30698532, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -784,6 +784,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -842,7 +843,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _steering.Angle
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _steering.Efficiency
@@ -854,6 +855,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _rigData.GafSail.Setup
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
+      propertyPath: rigState.GafSail.Angle
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
+      propertyPath: rigState.GafSail.Setup
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
@@ -870,6 +879,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _rigData.MainSail.Setup
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
+      propertyPath: rigState.FrontJib.Angle
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
+      propertyPath: rigState.FrontJib.Setup
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
+      propertyPath: rigState.MainSail.Setup
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}

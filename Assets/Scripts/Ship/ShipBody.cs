@@ -15,7 +15,7 @@ namespace Ship
         [SerializeField] private float _keelDrag = 0.9f;
 
         [FormerlySerializedAs("_rigData")] [SerializeField] private ShipRigState rigState;
-        [SerializeField] private ShipSteeringData _steering;
+        [SerializeField] private ShipSteeringState _steering;
 
 
         private SailView[] Sails;
@@ -108,7 +108,7 @@ namespace Ship
         }
         public void TurnWheel(float angle)
         {
-            _steering.Angle = angle;
+            _steering.Angle = (int)angle;
         }
 
         public ShipSailState GetSailInfo(SailType sail)
