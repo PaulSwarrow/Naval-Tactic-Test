@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Ship.Data;
 using Ship.Interfaces;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Ship.AI.Data
 {
@@ -21,7 +22,7 @@ namespace Ship.AI.Data
     {
         public ShipPhysicsData PhysicsData;
         [HideInInspector]
-        public ShipRigData RigData;
+        public ShipRigState RigState;
         public ShipSteeringData Steering;
         public WorldDirection RelativeWind;
     }

@@ -3,6 +3,7 @@ using Ship.AI.Data;
 using Ship.Data;
 using Ship.View;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Ship
@@ -13,7 +14,7 @@ namespace Ship
 
         [SerializeField] private float _keelDrag = 0.9f;
 
-        [SerializeField] private ShipRigData _rigData;
+        [FormerlySerializedAs("_rigData")] [SerializeField] private ShipRigState rigState;
         [SerializeField] private ShipSteeringData _steering;
 
 
@@ -51,7 +52,7 @@ namespace Ship
             var wind = _windSystem.GetWind(self.position); //assumption that wind doesn't change during time!
             var physicsData = GetPhysicsData();
             
-            var forces = ShipPhysics.CalculateForces(physicsData, _steering, _rigData, wind);
+            var forces = ShipPhysics.CalculateForces(physicsData, _steering, rigState, wind);
             var deceleration = ShipPhysics.CalculateHullDrag(physicsData);
             
             //add linear force
@@ -78,7 +79,7 @@ namespace Ship
             return new AIPredictionShipData()
             {
                 PhysicsData = GetPhysicsData(),
-                RigData = _rigData,
+                RigState = rigState,
                 Steering = _steering,
             };
         }
@@ -89,7 +90,7 @@ namespace Ship
             {
                 Position = self.position,
                 Rotation = self.rotation,
-                Velocity = _body.velocity,
+                Velocity = _velocity,
                 AngularVelocity = _angularVelocity,
                 Drag = _body.drag,
                 AngularDrag = _body.angularDrag,
@@ -110,18 +111,18 @@ namespace Ship
             _steering.Angle = angle;
         }
 
-        public ShipSailData GetSailInfo(SailSlot sail)
+        public ShipSailState GetSailInfo(SailType sail)
         {
-           return _rigData[sail];
+           return rigState[sail];
         }
 
         //TODO 
-        public void SetupSail(SailSlot slot, int value, float angle)
+        public void SetupSail(SailType type, int value, int angle)
         {
-            var sail = _rigData[slot];
+            var sail = rigState[type];
             sail.Setup = value;
             sail.Angle = angle;
-            _rigData[slot] = sail;
+            rigState[type] = sail;
         }
     }
 }

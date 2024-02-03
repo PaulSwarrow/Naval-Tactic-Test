@@ -20,7 +20,7 @@ namespace Ship.View
         
         [SerializeField] private Transform[] _sails;
 
-        [SerializeField] private SailSlot _sailData;
+        [SerializeField] private SailType _sailData;
         
         private ShipBody _ship;
 
@@ -31,11 +31,11 @@ namespace Ship.View
 
         private void Update()
         {
-            var wind = _windSystem.GetWind(transform.position);
-            var relativeWind = Quaternion.Euler(0, -transform.rotation.eulerAngles.y, 0) *wind;
             
             if (Application.isPlaying)
             {
+                var wind = _windSystem.GetWind(transform.position);
+                var relativeWind = Quaternion.Euler(0, -transform.rotation.eulerAngles.y, 0) *wind;
                 var info = _ship.GetSailInfo(_sailData);
                 Setup = info.Setup;
                 InputWind = info.GetInput(relativeWind);

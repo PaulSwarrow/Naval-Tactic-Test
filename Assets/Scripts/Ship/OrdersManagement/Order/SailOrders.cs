@@ -9,12 +9,12 @@ namespace Ship.AI.Order
 {
     public class SailOrder : IShipOrder
     {
-        public static IShipOrder JibRight() => new SailOrder(SailSlot.FrontJib, 1, 45);
-        public static IShipOrder JibLeft() => new SailOrder(SailSlot.FrontJib, 1, 135);
-        public static IShipOrder SpankerRight() => new SailOrder(SailSlot.Gaf, 1, 45);
-        public static IShipOrder SpankerLeft() => new SailOrder(SailSlot.Gaf, 1, 135);
-        public static IShipOrder Up(SailSlot slot) => new SailOrder(slot, 1);
-        public static IShipOrder Down(SailSlot slot) => new SailOrder(slot, 0);
+        public static IShipOrder JibRight() => new SailOrder(SailType.FrontJib, 1, 45);
+        public static IShipOrder JibLeft() => new SailOrder(SailType.FrontJib, 1, 135);
+        public static IShipOrder SpankerRight() => new SailOrder(SailType.Gaf, 1, 45);
+        public static IShipOrder SpankerLeft() => new SailOrder(SailType.Gaf, 1, 135);
+        public static IShipOrder Up(SailType type) => new SailOrder(type, 1);
+        public static IShipOrder Down(SailType type) => new SailOrder(type, 0);
         
         public static IEnumerable<IShipOrder> TurnRight(WorldDirection windRelative)
         {
@@ -33,7 +33,7 @@ namespace Ship.AI.Order
                     result.Add(SpankerRight());
                     break;
                 default:
-                    result.Add(Down(SailSlot.Gaf));
+                    result.Add(Down(SailType.Gaf));
                     break;
             }
             //jibs
@@ -49,7 +49,7 @@ namespace Ship.AI.Order
                     result.Add(JibLeft());
                     break;
                 default:
-                    result.Add(Down(SailSlot.FrontJib));
+                    result.Add(Down(SailType.FrontJib));
                     break;
             }
 
@@ -73,7 +73,7 @@ namespace Ship.AI.Order
                     result.Add(SpankerLeft());
                     break;
                 default:
-                    result.Add(Down(SailSlot.Gaf));
+                    result.Add(Down(SailType.Gaf));
                     break;
             }
             //jibs
@@ -89,36 +89,36 @@ namespace Ship.AI.Order
                     result.Add(JibRight());
                     break;
                 default:
-                    result.Add(Down(SailSlot.FrontJib));
+                    result.Add(Down(SailType.FrontJib));
                     break;
             }
 
             return result;
         }
 
-        private SailSlot _sailSlot;
+        private SailType _sailType;
         private int _setup;
         public int _angle;
 
-        private SailOrder(SailSlot sailSlot, int setup, int angle = 0)
+        private SailOrder(SailType sailType, int setup, int angle = 0)
         {
-            _sailSlot = sailSlot;
+            _sailType = sailType;
             _setup = setup;
             _angle = angle;
         }
 
         public bool Execute(ShipBody ship)
         {
-            ship.SetupSail(_sailSlot,_setup,_angle);
+            ship.SetupSail(_sailType,_setup,_angle);
             return true;
         }
 
         public bool Simulate(ManeuverContext context, float deltaTime)
         {
-            var sail = context.Self.RigData[_sailSlot];
+            var sail = context.Self.RigState[_sailType];
             sail.Setup = _setup;
             sail.Angle = _angle;
-            context.Self.RigData[_sailSlot] = sail;
+            context.Self.RigState[_sailType] = sail;
             return true;
         }
 
@@ -126,7 +126,7 @@ namespace Ship.AI.Order
 
         public override string ToString()
         {
-            return $"[SailOrder_{_sailSlot}_{_setup}_{_angle}";
+            return $"[SailOrder_{_sailType}_{_setup}_{_angle}";
         }
     }
     

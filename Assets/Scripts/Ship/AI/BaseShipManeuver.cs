@@ -51,7 +51,7 @@ namespace Ship.AI
                 
                 angle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, direction, Vector3.up);
             }
-            CheckPoint(context, result, SailOrder.Down(SailSlot.FrontJib), SailOrder.Down(SailSlot.Gaf));
+            CheckPoint(context, result, SailOrder.Down(SailType.FrontJib), SailOrder.Down(SailType.Gaf));
         }
         
         protected void FastForward(float seconds, ManeuverContext context, Func<bool> stopCondition = null)
@@ -63,7 +63,7 @@ namespace Ship.AI
             for (; context.Time < endTime; context.Time += deltaTime)
             {
                 var wind = context.Wind.GetWind(body.Position); //assumption that wind doesn't change during time!
-                var forces = ShipPhysics.CalculateForces(body, context.Self.Steering, context.Self.RigData, wind);
+                var forces = ShipPhysics.CalculateForces(body, context.Self.Steering, context.Self.RigState, wind);
                 
                 var deceleration = ShipPhysics.CalculateHullDrag(body);
                 // Calculate the acceleration due to drag force

@@ -7,7 +7,7 @@ namespace Ship
 {
     public static class ShipPhysics
     {
-        public static (Vector3 linear, Vector3 angular) CalculateForces(ShipPhysicsData physics, ShipSteeringData steering, ShipRigData rigging, Vector3 wind)
+        public static (Vector3 linear, Vector3 angular) CalculateForces(ShipPhysicsData physics, ShipSteeringData steering, ShipRigState rigging, Vector3 wind)
         {
             var shipDirection = physics.Rotation * Vector3.forward;
             var right = physics.Rotation * Vector3.right;
@@ -23,8 +23,8 @@ namespace Ship
                 var force = vector * (sail.GetInput(relativeWind) * sail.Setup);
                 totalForce += force;
                 var forceRight = Vector3.Dot(force, right);
-                if (type == SailSlot.FrontJib) steeringForce += forceRight * rigging.SteeringEfficiency;
-                if (type == SailSlot.Gaf) steeringForce -= forceRight * rigging.SteeringEfficiency;
+                if (type == SailType.FrontJib) steeringForce += forceRight * 50;
+                if (type == SailType.Gaf) steeringForce -= forceRight * 50;
             });
             
             

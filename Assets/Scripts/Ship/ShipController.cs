@@ -33,12 +33,11 @@ namespace Ship
 
         private void Start()
         {
-            TEST().Forget();
+            //TEST().Forget();
         }
 
         private void Update()
         {
-            
             _activeOrders.ForeachOrder(order =>
             {
                 if (order.Execute(_body)) _activeOrders.RemoveOrder(order);
@@ -63,7 +62,7 @@ namespace Ship
         [Button]
         private void SailDown()
         {
-            _activeOrders.AddRange(SailOrder.Down(SailSlot.FrontJib), SailOrder.Down(SailSlot.Gaf));
+            _activeOrders.AddRange(SailOrder.Down(SailType.FrontJib), SailOrder.Down(SailType.Gaf));
         }
 
         private async UniTask TEST()
