@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Ship.Data
 {
@@ -82,6 +83,11 @@ namespace Ship.Data
     {
         public float Angle;
         public int Setup;
-        public float Input;
+        public float GetInput(Vector3 relativeWind)
+        {
+            var v = Quaternion.Euler(0, Angle, 0) * Vector3.forward;
+            var dotProduct = Vector3.Dot(v, relativeWind.normalized);
+            return relativeWind.magnitude * dotProduct;
+        }
     }
 }

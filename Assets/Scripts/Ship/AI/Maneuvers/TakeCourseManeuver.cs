@@ -20,10 +20,10 @@ namespace Ship.AI.Maneuvers
             // CheckPoint(context, result, SteeringOrders.KeepCourse(targetAngle));
             var deltaAngle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, _direction, Vector3.up);
             //CheckPoint(context, result, deltaAngle);
-            
-            
+            TurnTo(_direction, context, result);
+            CheckPoint(context, result, SteeringOrders.KeepCourse(_direction));
             //DO orders
-            FastForward(3, context);
+            FastForward(8, context);
             CheckPoint(context, result);
             
             

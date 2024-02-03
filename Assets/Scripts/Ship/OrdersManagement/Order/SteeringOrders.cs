@@ -7,13 +7,13 @@ namespace Ship.AI.Order
     public class SteeringOrders : IShipOrder
     {
 
-        public static IShipOrder KeepCourse(float direction) => new SteeringOrders(direction);
+        public static IShipOrder KeepCourse(Vector3 direction) => new SteeringOrders(direction);
         
         
 
-        private float _targetDirection;
+        private Vector3 _targetDirection;
 
-        private SteeringOrders(float targetDirection)
+        private SteeringOrders(Vector3 targetDirection)
         {
             this._targetDirection = targetDirection;
         }
@@ -22,7 +22,7 @@ namespace Ship.AI.Order
         public bool Execute(ShipBody ship)
         {
             var forward = ship.Rotation * Vector3.forward;
-            var direction = Quaternion.Euler(0, _targetDirection, 0) * Vector3.forward;
+            var direction = _targetDirection;
             var deltaAngle = Vector3.SignedAngle(forward, direction, Vector3.up);
             deltaAngle *= 2f;//rotation effectiveness?
             deltaAngle = Mathf.Clamp(deltaAngle, -45, 45);
@@ -34,7 +34,7 @@ namespace Ship.AI.Order
         public bool Simulate(ManeuverContext context, float deltaTime)
         {
             var forward = context.Self.PhysicsData.Rotation * Vector3.forward;
-            var direction = Quaternion.Euler(0, _targetDirection, 0) * Vector3.forward;
+            var direction = _targetDirection;
             var deltaAngle = Vector3.SignedAngle(forward, direction, Vector3.up);
             deltaAngle *= 2f;//rotation effectiveness?
             deltaAngle = Mathf.Clamp(deltaAngle, -45, 45);

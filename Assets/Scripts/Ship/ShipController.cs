@@ -33,7 +33,7 @@ namespace Ship
 
         private void Start()
         {
-            //TEST().Forget();
+            TEST().Forget();
         }
 
         private void Update()
@@ -76,6 +76,7 @@ namespace Ship
             var maneuver = new TakeCourseManeuver(Vector3.forward);
             _prediction = maneuver.Calculate(context);
             await ExecuteManeuver(_prediction);
+            Debug.Log("Maneuver Complete");
         }
 
         private async UniTask ExecuteManeuver(ManeuverPrediction maneuver)

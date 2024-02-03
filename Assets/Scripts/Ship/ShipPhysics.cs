@@ -13,13 +13,14 @@ namespace Ship
             var right = physics.Rotation * Vector3.right;
             var velocity = physics.Velocity;
             var totalForce = Vector3.zero;
+            var relativeWind = Quaternion.Euler(0, -physics.Rotation.eulerAngles.y, 0) * wind;
 
             var steeringForce = 0f;
             
             rigging.ForeachSail((type, sail) =>
             {
                 var vector = Quaternion.Euler(0, sail.Angle, 0) * shipDirection;
-                var force = vector * (sail.Input * sail.Setup);
+                var force = vector * (sail.GetInput(relativeWind) * sail.Setup);
                 totalForce += force;
                 var forceRight = Vector3.Dot(force, right);
                 if (type == SailSlot.FrontJib) steeringForce += forceRight * rigging.SteeringEfficiency;
@@ -54,23 +55,7 @@ namespace Ship
 
             return acceleration;
         }
-
-        public static void UpdateWindInput(ref ShipRigData data, Vector3 shipDirection, Vector3 wind)
-        {
-            SailSlot[] sailSlots = (SailSlot[])Enum.GetValues(typeof(SailSlot));
-
-            // Iterate through the enum values
-            foreach (SailSlot slot in sailSlots)
-            {
-                //TODO self shadowing
-                var sail = data[slot];
-                var vector = Quaternion.Euler(0, sail.Angle, 0) * shipDirection;
-                var dotProduct = Vector3.Dot(vector, wind.normalized);
-                sail.Input = wind.magnitude * dotProduct;
-                data[slot] = sail;
-            }
-        }
-
+        
         public static WorldDirection GetRelativeWind(Vector3 wind, Vector3 shipForward)
         {
             var angle = Vector3.SignedAngle(shipForward, wind, Vector3.up);

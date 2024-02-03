@@ -118,6 +118,7 @@ namespace Ship.AI.Order
             var sail = context.Self.RigData[_sailSlot];
             sail.Setup = _setup;
             sail.Angle = _angle;
+            context.Self.RigData[_sailSlot] = sail;
             return true;
         }
 

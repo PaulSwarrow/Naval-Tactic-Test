@@ -1,12 +1,15 @@
 ﻿using System;
+using DefaultNamespace.GameSystems;
 using Ship.Data;
 using UnityEngine;
+using Zenject;
 
 namespace Ship.View
 {
     [ExecuteInEditMode]
     public class SailView : MonoBehaviour
     {
+        [Inject] private WindSystem _windSystem;
         [Range(0.1f,1)]
         public float InputWind;
 
@@ -28,11 +31,14 @@ namespace Ship.View
 
         private void Update()
         {
+            var wind = _windSystem.GetWind(transform.position);
+            var relativeWind = Quaternion.Euler(0, -transform.rotation.eulerAngles.y, 0) *wind;
+            
             if (Application.isPlaying)
             {
                 var info = _ship.GetSailInfo(_sailData);
                 Setup = info.Setup;
-                InputWind = info.Input;
+                InputWind = info.GetInput(relativeWind);
                 Angle = info.Angle;
             }
             if(_sails == null) return;

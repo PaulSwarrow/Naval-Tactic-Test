@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using DefaultNamespace.GameSystems;
 using Ship.AI.Data;
+using Ship.AI.Order;
+using Ship.Data;
 using UnityEngine;
 
 namespace Ship.AI
@@ -27,6 +30,30 @@ namespace Ship.AI
                 Orders = orders,
             });
         }
+
+        protected void TurnTo(Vector3 direction, ManeuverContext context, ManeuverPrediction result)
+        {
+            var angle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, direction, Vector3.up);
+            var t = context.Time;
+            while (Mathf.Abs(angle) > 1 && context.Time - t < 50)
+            {
+                var wind = context.Wind.GetWind(context.Self.PhysicsData.Position);
+                var relativeWind = ShipPhysics.GetRelativeWind(wind, context.Self.PhysicsData.Forward);
+                var order = angle > 0 ? SailOrder.TurnRight(relativeWind) : SailOrder.TurnLeft(relativeWind);
+                CheckPoint(context, result, order.ToArray());
+                FastForward(2, context, () =>
+                {
+                    var a = Vector3.SignedAngle(context.Self.PhysicsData.Forward, direction, Vector3.up);
+                    var w = context.Wind.GetWind(context.Self.PhysicsData.Position);
+                    var rw = ShipPhysics.GetRelativeWind(w, context.Self.PhysicsData.Forward);
+                    return Mathf.Abs(a) < 1 || rw != relativeWind;
+                });
+                
+                angle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, direction, Vector3.up);
+            }
+            CheckPoint(context, result, SailOrder.Down(SailSlot.FrontJib), SailOrder.Down(SailSlot.Gaf));
+        }
+        
         protected void FastForward(float seconds, ManeuverContext context, Func<bool> stopCondition = null)
         {
             var deltaTime = Time.fixedDeltaTime; //performance concern
@@ -36,7 +63,6 @@ namespace Ship.AI
             for (; context.Time < endTime; context.Time += deltaTime)
             {
                 var wind = context.Wind.GetWind(body.Position); //assumption that wind doesn't change during time!
-                ShipPhysics.UpdateWindInput(ref context.Self.RigData, body.Rotation * Vector3.forward ,wind);
                 var forces = ShipPhysics.CalculateForces(body, context.Self.Steering, context.Self.RigData, wind);
                 
                 var deceleration = ShipPhysics.CalculateHullDrag(body);

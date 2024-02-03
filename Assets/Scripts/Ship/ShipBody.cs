@@ -42,6 +42,7 @@ namespace Ship
         }
 
         private Vector3 _angularVelocity;
+        private Vector3 _velocity;
 
         private void FixedUpdate()
         {
@@ -50,13 +51,19 @@ namespace Ship
             var wind = _windSystem.GetWind(self.position); //assumption that wind doesn't change during time!
             var physicsData = GetPhysicsData();
             
-            ShipPhysics.UpdateWindInput(ref _rigData, self.forward, wind);
             var forces = ShipPhysics.CalculateForces(physicsData, _steering, _rigData, wind);
             var deceleration = ShipPhysics.CalculateHullDrag(physicsData);
             
-            _body.AddForce(deceleration, ForceMode.Acceleration);
             //add linear force
-            _body.AddForce(forces.linear);
+            var mass = _body.mass;
+            
+            Vector3 acceleration = (forces.linear - _body.velocity * _body.drag) / _body.mass + deceleration;
+            var averageSpeed = _velocity + acceleration * t / 2;
+            Vector3 newPosition = _body.position + averageSpeed * t;
+            
+            _body.MovePosition(newPosition);
+            _velocity = _velocity + acceleration * t;
+            //_body.AddForce();
             
             //add angular force manually
             Vector3 angularAcceleration = (forces.angular - _angularVelocity * _body.angularDrag) / _body.inertiaTensor.magnitude;
@@ -96,7 +103,7 @@ namespace Ship
         
         private void OnGUI()
         {
-            GUILayout.Label($" t: {_time}\np:{_body.position}\nv:{_body.velocity}\nr:{_body.rotation.eulerAngles.y}\nav{_angularVelocity.y}");
+            GUILayout.Label($" t: {_time}\np:{_body.position}\nv:{_velocity}\nr:{_body.rotation.eulerAngles.y}\nav{_angularVelocity.y}");
         }
         public void TurnWheel(float angle)
         {
