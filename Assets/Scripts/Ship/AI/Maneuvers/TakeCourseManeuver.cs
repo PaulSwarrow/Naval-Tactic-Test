@@ -8,21 +8,24 @@ namespace Ship.AI.Maneuvers
     public class TakeCourseManeuver : BaseShipManeuver
     {
         private float _accuracy;
-        private Vector3 _direction;
+        private float _course;
 
         public TakeCourseManeuver(Vector3 direction, float accuracy  = 0.5f)
         {
-            _direction = direction;
+            _course = Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
+            this._accuracy = accuracy;
+        }
+        public TakeCourseManeuver(float course, float accuracy  = 0.5f)
+        {
+            _course = course;
             this._accuracy = accuracy;
         }
 
         protected override void DoCalculation(ManeuverContext context, ManeuverPrediction result)
         {
-            // CheckPoint(context, result, SteeringOrders.KeepCourse(targetAngle));
-            var deltaAngle = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, _direction, Vector3.up);
             //CheckPoint(context, result, deltaAngle);
-            TurnTo(_direction, context, result);
-            CheckPoint(context, result, ShipCommands.KeepCourse(_direction));
+            TurnTo(_course, context, result);
+            CheckPoint(context, result, ShipCommands.KeepCourse(_course));
             //DO orders
             FastForward(8, context);
             CheckPoint(context, result);

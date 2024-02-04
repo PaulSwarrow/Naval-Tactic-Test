@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using DefaultNamespace.GameSystems;
+using Ship.AI.CommandsGraphSearch;
 using Ship.AI.Data;
 using Ship.AI.Order;
 using Ship.Data;
@@ -10,6 +11,7 @@ namespace Ship.AI
 {
     public abstract class BaseShipManeuver
     {
+        private CommandsComposer _commandsComposer;
         public ManeuverPrediction Calculate(ManeuverContext context)
         {
             var result = new ManeuverPrediction();
@@ -31,27 +33,21 @@ namespace Ship.AI
             });
         }
 
-        protected void TurnTo(Vector3 direction, ManeuverContext context, ManeuverPrediction result)
+        protected void TurnTo(float course, ManeuverContext context, ManeuverPrediction result)
         {
-            var angle = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, direction, Vector3.up);
+            var deltaAngle = course - context.Ship.PhysicsData.Rotation.eulerAngles.y;
             var t = context.Time;
-            while (Mathf.Abs(angle) > 1 && context.Time - t < 50)
+            while (Mathf.Abs(deltaAngle) > 1 && context.Time - t < 50)
             {
-                var wind = context.Wind.GetWind(context.Ship.PhysicsData.Position);
-                var relativeWind = ShipPhysics.GetRelativeWind(wind, context.Ship.PhysicsData.Forward);
-                var order = angle > 0 ? SailOrder.TurnRight(relativeWind) : SailOrder.TurnLeft(relativeWind);
-                CheckPoint(context, result, order.ToArray());
-                FastForward(2, context, () =>
-                {
-                    var a = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, direction, Vector3.up);
-                    var w = context.Wind.GetWind(context.Ship.PhysicsData.Position);
-                    var rw = ShipPhysics.GetRelativeWind(w, context.Ship.PhysicsData.Forward);
-                    return Mathf.Abs(a) < 1 || rw != relativeWind;
-                });
-                
-                angle = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, direction, Vector3.up);
+                //commands composer should work with current "target" configuration, not factual - to prevent same from giving same orders repeatedly
+                var commands = _commandsComposer.Turn(context, deltaAngle > 0 ? RotationDirection.Right : RotationDirection.Left);
+                CheckPoint(context, result, commands.ToArray());
+                FastForward(1, context);
+                deltaAngle = course - context.Ship.PhysicsData.Rotation.eulerAngles.y;
             }
-            CheckPoint(context, result, SailOrder.Down(SailType.FrontJib), SailOrder.Down(SailType.Gaf));
+
+            var stopCommands = _commandsComposer.StopRotation(context);
+            CheckPoint(context, result, stopCommands.ToArray());
         }
         
         protected void FastForward(float seconds, ManeuverContext context, Func<bool> stopCondition = null)
@@ -63,7 +59,7 @@ namespace Ship.AI
             for (; context.Time < endTime; context.Time += deltaTime)
             {
                 var wind = context.Wind.GetWind(body.Position); //assumption that wind doesn't change during time!
-                var forces = ShipPhysics.CalculateForces(body, context.Ship.Steering, context.Ship.RigState, wind);
+                var forces = ShipPhysics.CalculateForces(body, context.Ship.Configuration, wind);
                 
                 var deceleration = ShipPhysics.CalculateHullDrag(body);
                 // Calculate the acceleration due to drag force
@@ -89,7 +85,6 @@ namespace Ship.AI
                 body.Velocity = newVelocity;
                 body.Rotation = newRotation;
                 body.AngularVelocity = newAngularVelocity;
-                context.Ship.RelativeWind = ShipPhysics.GetRelativeWind(wind, body.Forward);
                 context.Ship.PhysicsData = body;
 
                 for (int i = context.ActiveOrders.Count - 1; i >= 0; i--)

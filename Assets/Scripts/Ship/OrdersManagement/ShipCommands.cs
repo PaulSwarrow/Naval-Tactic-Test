@@ -14,7 +14,7 @@ namespace Ship.OrdersManagement
 
         public static IShipOrder Steer(int angle) => new SteeringCommand(angle);
 
-        public static IShipOrder KeepCourse(Vector3 direction) => new KeepCourseCommand(direction);
+        public static IShipOrder KeepCourse(float course) => new KeepCourseCommand(course);
 
     }
 
