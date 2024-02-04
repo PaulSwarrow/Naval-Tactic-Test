@@ -4,7 +4,7 @@ using DefaultNamespace.Utils.MissingNetClasses;
 
 namespace Ship.AI.CommandsGraphSearch
 {
-    public abstract class PathfindingAlgorithm<TNode, TEdge, TPathElement>
+    public abstract class PathfindingAlgorithm<TNode, TEdge, TContext, TPathElement>
     {
         protected struct EdgeInfo
         {
@@ -13,7 +13,7 @@ namespace Ship.AI.CommandsGraphSearch
             public int Cost;
         }
         
-        protected PathData<TPathElement> FindBest(TNode start, Func<TNode, int> estimator)
+        protected PathData<TPathElement> FindBest(TNode start, TContext context, Func<TNode, int> estimator)
         {
             var frontier = new SimplePriorityQueue<TNode>();
             frontier.Enqueue(start, 0);
@@ -39,7 +39,7 @@ namespace Ship.AI.CommandsGraphSearch
                     
                 }
 
-                foreach (var edgeInfo in GetEdges(current))
+                foreach (var edgeInfo in GetEdges(current, context))
                 {
                     var newCost = costSoFar[current] + edgeInfo.Cost;
                     if (!costSoFar.ContainsKey(edgeInfo.Destination) || newCost < costSoFar[edgeInfo.Destination])
@@ -56,7 +56,7 @@ namespace Ship.AI.CommandsGraphSearch
             return ReconstructPath(cameFrom, start, bestNode);
         }
         
-        protected PathData<TPathElement> FindPathTo(TNode start, Predicate<TNode> isDestination, Func<TNode, int, int> heuristic)
+        protected PathData<TPathElement> FindPathTo(TNode start, TContext context, Predicate<TNode> isDestination, Func<TNode, int, int> heuristic)
         {
             var frontier = new SimplePriorityQueue<TNode>();
             frontier.Enqueue(start, 0);
@@ -76,7 +76,7 @@ namespace Ship.AI.CommandsGraphSearch
                     return ReconstructPath(cameFrom, start, current);
                 }
 
-                foreach (var edgeInfo in GetEdges(current))
+                foreach (var edgeInfo in GetEdges(current, context))
                 {
                     var newCost = costSoFar[current] + edgeInfo.Cost;
                     if (!costSoFar.ContainsKey(edgeInfo.Destination) || newCost < costSoFar[edgeInfo.Destination])
@@ -93,7 +93,7 @@ namespace Ship.AI.CommandsGraphSearch
             return null;
         }
         // Function to get neighbors; adapt to your needs
-        protected abstract List<EdgeInfo> GetEdges(TNode node);
+        protected abstract List<EdgeInfo> GetEdges(TNode node, TContext context);
 
         private PathData<TPathElement> ReconstructPath(Dictionary<TNode, (TNode node, TEdge edge)> cameFrom, TNode start, TNode end)
         {

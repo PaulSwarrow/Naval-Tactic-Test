@@ -11,10 +11,11 @@ namespace Ship.AI.Data
     {
         public float Time;
         public List<IShipOrder> ActiveOrders = new List<IShipOrder>();
-        public AIPredictionShipData Self;
+        public AIPredictionShipData Ship;
 
         public IWindProvider Wind;
         public IDepthProvider Depth;
+        public IShipSetup ShipSetup;
     }
 
     [Serializable]

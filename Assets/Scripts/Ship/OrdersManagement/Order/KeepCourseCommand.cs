@@ -31,14 +31,14 @@ namespace Ship.AI.Order
 
         public bool Simulate(ManeuverContext context, float deltaTime)
         {
-            var forward = context.Self.PhysicsData.Rotation * Vector3.forward;
+            var forward = context.Ship.PhysicsData.Rotation * Vector3.forward;
             var direction = _targetDirection;
             var deltaAngle = Vector3.SignedAngle(forward, direction, Vector3.up);
             deltaAngle *= 2f;//rotation effectiveness?
             deltaAngle = Mathf.Clamp(deltaAngle, -45, 45);
 
             //TODO simulate update
-            context.Self.Configuration.Steering.Angle = (int)deltaAngle;
+            context.Ship.Configuration.Steering.Angle = (int)deltaAngle;
             return false;
         }
 

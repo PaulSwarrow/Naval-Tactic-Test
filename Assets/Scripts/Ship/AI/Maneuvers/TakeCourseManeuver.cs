@@ -19,7 +19,7 @@ namespace Ship.AI.Maneuvers
         protected override void DoCalculation(ManeuverContext context, ManeuverPrediction result)
         {
             // CheckPoint(context, result, SteeringOrders.KeepCourse(targetAngle));
-            var deltaAngle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, _direction, Vector3.up);
+            var deltaAngle = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, _direction, Vector3.up);
             //CheckPoint(context, result, deltaAngle);
             TurnTo(_direction, context, result);
             CheckPoint(context, result, ShipCommands.KeepCourse(_direction));

@@ -7,43 +7,38 @@ using UnityEngine;
 
 namespace Ship.AI.CommandsGraphSearch
 {
-    public class CommandsComposer : PathfindingAlgorithm<ManeuverNode, ManeuverEdge, ManeuverEdge>
+    public class CommandsComposer : PathfindingAlgorithm<ManeuverNode, ManeuverEdge, ManeuverContext, IShipOrder>
     {
-        private readonly int[] SteeringAngles = new[] { 0, 45, 90, -45, -90 };
+        private readonly int[] _steeringAngles = new[] { 0, 45, 90, -45, -90 };
 
-        public ShipPhysicsData ShipData;
-        public IShipSetup Setup;
-        public IWindProvider WindProvider;
-
-
-        public PathData<ManeuverEdge> Turn(ManeuverContext context, RotationDirection direction)
+        public PathData<IShipOrder> Turn(ManeuverContext context, RotationDirection direction)
         {
             var start = CreateInitialNode(context);
-            return FindBest(start,
+            return FindBest(start, context, 
                 (node) => direction == RotationDirection.Right ? node.AngularForce : -node.AngularForce);
         }
 
-        public PathData<ManeuverEdge> StopRotation(ManeuverContext context)
+        public PathData<IShipOrder> StopRotation(ManeuverContext context)
         {
             var start = CreateInitialNode(context);
-            return FindBest(start,
+            return FindBest(start, context,
                 node => int.MaxValue - Mathf.Abs(node.AngularForce));
         }
 
-        public PathData<ManeuverEdge> FullForward(ManeuverContext context)
+        public PathData<IShipOrder> FullForward(ManeuverContext context)
         {
             var start = CreateInitialNode(context);
-            return FindBest(start, node => node.LinearForce - Mathf.Abs(node.AngularForce));
+            return FindBest(start, context, node => node.LinearForce - Mathf.Abs(node.AngularForce));
         }
 
-        public PathData<ManeuverEdge> FullStop(ManeuverContext context)
+        public PathData<IShipOrder> FullStop(ManeuverContext context)
         {
             var start = CreateInitialNode(context);
-            return FindBest(start, node => int.MaxValue - Mathf.Abs(node.LinearForce));
+            return FindBest(start, context,node => int.MaxValue - Mathf.Abs(node.LinearForce));
         }
 
 
-        protected override List<EdgeInfo> GetEdges(ManeuverNode node)
+        protected override List<EdgeInfo> GetEdges(ManeuverNode node, ManeuverContext context)
         {
             var edges = new List<EdgeInfo>();
             //generate sail commands
@@ -51,20 +46,20 @@ namespace Ship.AI.CommandsGraphSearch
             {
                 EdgeInfo entry;
                 //change angle commands
-                foreach (var angle in Setup.SailAnglesAvailable(type))
+                foreach (var angle in context.ShipSetup.SailAnglesAvailable(type))
                 {
                     if (angle != state.Angle && state.Setup == 0)
                     {
                         entry = new EdgeInfo();
                         entry.Edge = new ManeuverEdge();
                         entry.Edge.Order = ShipCommands.SailTurn(type, angle);
-                        entry.Destination = GetEdgeDestination(node, entry.Edge);
+                        entry.Destination = GetEdgeDestination(node, entry.Edge, context);
                         edges.Add(entry);
                     }
                 }
 
                 //change setup commands
-                foreach (var setup in Setup.SailSetupsAvailable(type))
+                foreach (var setup in context.ShipSetup.SailSetupsAvailable(type))
                 {
                     if (setup != state.Setup)
                     {
@@ -74,7 +69,7 @@ namespace Ship.AI.CommandsGraphSearch
                         entry = new EdgeInfo();
                         entry.Edge = new ManeuverEdge();
                         entry.Edge.Order = ShipCommands.SailSetup(type, setup);
-                        entry.Destination = GetEdgeDestination(node, entry.Edge);
+                        entry.Destination = GetEdgeDestination(node, entry.Edge, context);
                         entry.Cost = GetGeneralCost(node, entry.Edge);
                         edges.Add(entry);
                     }
@@ -82,7 +77,7 @@ namespace Ship.AI.CommandsGraphSearch
             });
 
 
-            foreach (var angle in SteeringAngles)
+            foreach (var angle in _steeringAngles)
             {
                 var entry = new EdgeInfo()
                 {
@@ -91,7 +86,7 @@ namespace Ship.AI.CommandsGraphSearch
                         Order = ShipCommands.Steer(angle)
                     }
                 };
-                entry.Destination = GetEdgeDestination(node, entry.Edge);
+                entry.Destination = GetEdgeDestination(node, entry.Edge, context);
                 entry.Cost = GetGeneralCost(node, entry.Edge);
                 edges.Add(entry);
             }
@@ -99,20 +94,20 @@ namespace Ship.AI.CommandsGraphSearch
             return edges;
         }
 
-        protected override ManeuverEdge CreatePathElement(ManeuverNode origin, ManeuverEdge step)
+        protected override IShipOrder CreatePathElement(ManeuverNode origin, ManeuverEdge step)
         {
-            return step;
+            return step.Order;
         }
 
         private ManeuverNode CreateInitialNode(ManeuverContext context)
         {
-            var wind = WindProvider.GetWind(ShipData.Position);
-            var forces = ShipPhysics.CalculateForces(ShipData, context.Self.Configuration, wind);
+            var wind = context.Wind.GetWind(context.Ship.PhysicsData.Position);
+            var forces = ShipPhysics.CalculateForces(context.Ship.PhysicsData, context.Ship.Configuration, wind);
             return new ManeuverNode()
             {
                 LinearForce = (int)forces.linear.z,
                 AngularForce = (int)forces.angular.y,
-                Configuration = context.Self.Configuration
+                Configuration = context.Ship.Configuration
             };
         }
 
@@ -121,14 +116,13 @@ namespace Ship.AI.CommandsGraphSearch
             var estimation = edge.Order.Estimate(node.Configuration);
             return estimation.Seconds + (estimation.CrewUnits * estimation.Risk);
         }
-
-
-        private ManeuverNode GetEdgeDestination(ManeuverNode node, ManeuverEdge edge)
+        
+        private ManeuverNode GetEdgeDestination(ManeuverNode node, ManeuverEdge edge, ManeuverContext context)
         {
-            var wind = WindProvider.GetWind(ShipData.Position);
+            var wind = context.Wind.GetWind(context.Ship.PhysicsData.Position);
             var destination = node;
             edge.Order.ApplyTo(ref destination.Configuration);
-            var forces = ShipPhysics.CalculateForces(ShipData, destination.Configuration, wind);
+            var forces = ShipPhysics.CalculateForces(context.Ship.PhysicsData, destination.Configuration, wind);
             destination.LinearForce = (int)forces.linear.z;
             destination.AngularForce = (int)forces.angular.y;
             return destination;

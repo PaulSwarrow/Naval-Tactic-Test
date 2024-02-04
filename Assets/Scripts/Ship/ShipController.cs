@@ -50,7 +50,7 @@ namespace Ship
         { 
             var context = new ManeuverContext()
             {
-                Self = _body.ExportToAI(),
+                Ship = _body.ExportToAI(),
                 Wind = _windSystem
             };
             var maneuver = new TakeCourseManeuver(Vector3.forward);

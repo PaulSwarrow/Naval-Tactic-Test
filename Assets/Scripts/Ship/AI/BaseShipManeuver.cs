@@ -25,7 +25,7 @@ namespace Ship.AI
             context.ActiveOrders.AddRange(orders);
             result.Trajectory.Add(new ManeuverPredictionPhase()
             {
-                Self = context.Self,
+                Self = context.Ship,
                 Timestamp = context.Time,
                 Orders = orders,
             });
@@ -33,23 +33,23 @@ namespace Ship.AI
 
         protected void TurnTo(Vector3 direction, ManeuverContext context, ManeuverPrediction result)
         {
-            var angle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, direction, Vector3.up);
+            var angle = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, direction, Vector3.up);
             var t = context.Time;
             while (Mathf.Abs(angle) > 1 && context.Time - t < 50)
             {
-                var wind = context.Wind.GetWind(context.Self.PhysicsData.Position);
-                var relativeWind = ShipPhysics.GetRelativeWind(wind, context.Self.PhysicsData.Forward);
+                var wind = context.Wind.GetWind(context.Ship.PhysicsData.Position);
+                var relativeWind = ShipPhysics.GetRelativeWind(wind, context.Ship.PhysicsData.Forward);
                 var order = angle > 0 ? SailOrder.TurnRight(relativeWind) : SailOrder.TurnLeft(relativeWind);
                 CheckPoint(context, result, order.ToArray());
                 FastForward(2, context, () =>
                 {
-                    var a = Vector3.SignedAngle(context.Self.PhysicsData.Forward, direction, Vector3.up);
-                    var w = context.Wind.GetWind(context.Self.PhysicsData.Position);
-                    var rw = ShipPhysics.GetRelativeWind(w, context.Self.PhysicsData.Forward);
+                    var a = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, direction, Vector3.up);
+                    var w = context.Wind.GetWind(context.Ship.PhysicsData.Position);
+                    var rw = ShipPhysics.GetRelativeWind(w, context.Ship.PhysicsData.Forward);
                     return Mathf.Abs(a) < 1 || rw != relativeWind;
                 });
                 
-                angle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, direction, Vector3.up);
+                angle = Vector3.SignedAngle(context.Ship.PhysicsData.Forward, direction, Vector3.up);
             }
             CheckPoint(context, result, SailOrder.Down(SailType.FrontJib), SailOrder.Down(SailType.Gaf));
         }
@@ -58,12 +58,12 @@ namespace Ship.AI
         {
             var deltaTime = Time.fixedDeltaTime; //performance concern
 
-            var body = context.Self.PhysicsData;
+            var body = context.Ship.PhysicsData;
             var endTime = context.Time + seconds;
             for (; context.Time < endTime; context.Time += deltaTime)
             {
                 var wind = context.Wind.GetWind(body.Position); //assumption that wind doesn't change during time!
-                var forces = ShipPhysics.CalculateForces(body, context.Self.Steering, context.Self.RigState, wind);
+                var forces = ShipPhysics.CalculateForces(body, context.Ship.Steering, context.Ship.RigState, wind);
                 
                 var deceleration = ShipPhysics.CalculateHullDrag(body);
                 // Calculate the acceleration due to drag force
@@ -89,8 +89,8 @@ namespace Ship.AI
                 body.Velocity = newVelocity;
                 body.Rotation = newRotation;
                 body.AngularVelocity = newAngularVelocity;
-                context.Self.RelativeWind = ShipPhysics.GetRelativeWind(wind, body.Forward);
-                context.Self.PhysicsData = body;
+                context.Ship.RelativeWind = ShipPhysics.GetRelativeWind(wind, body.Forward);
+                context.Ship.PhysicsData = body;
 
                 for (int i = context.ActiveOrders.Count - 1; i >= 0; i--)
                 {

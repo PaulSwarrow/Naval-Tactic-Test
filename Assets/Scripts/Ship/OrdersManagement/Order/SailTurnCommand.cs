@@ -24,7 +24,7 @@ namespace Ship.AI.Order
 
         public bool Simulate(ManeuverContext context, float deltaTime)
         {
-            ApplyTo(ref context.Self.Configuration);
+            ApplyTo(ref context.Ship.Configuration);
             return true;
         }
         public void ApplyTo(ref ShipConfiguration configuration)
