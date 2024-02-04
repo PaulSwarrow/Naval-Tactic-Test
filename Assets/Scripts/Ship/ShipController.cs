@@ -45,25 +45,6 @@ namespace Ship
             });
         }
 
-        [Button]
-        private void SailsTurnRight()
-        {
-            var wind = ShipPhysics.GetRelativeWind(_windSystem.GetWind(transform.position), transform.forward);
-            Debug.Log(wind);
-            _activeOrders.AddRange(SailOrder.TurnRight(wind).ToArray());
-        }
-        [Button]
-        private void SailsTurnLeft()
-        {
-            var wind = ShipPhysics.GetRelativeWind(_windSystem.GetWind(transform.position), transform.forward);
-            Debug.Log(wind);
-            _activeOrders.AddRange(SailOrder.TurnLeft(wind).ToArray());
-        }
-        [Button]
-        private void SailDown()
-        {
-            _activeOrders.AddRange(SailOrder.Down(SailType.FrontJib), SailOrder.Down(SailType.Gaf));
-        }
 
         private async UniTask TEST()
         { 

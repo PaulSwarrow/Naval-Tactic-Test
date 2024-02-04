@@ -21,10 +21,7 @@ namespace Ship.AI.Data
     public struct AIPredictionShipData
     {
         public ShipPhysicsData PhysicsData;
-        [HideInInspector]
-        public ShipRigState RigState;
-        public ShipSteeringState Steering;
-        public WorldDirection RelativeWind;
+        [HideInInspector] public ShipConfiguration Configuration;
     }
     
     [Serializable]

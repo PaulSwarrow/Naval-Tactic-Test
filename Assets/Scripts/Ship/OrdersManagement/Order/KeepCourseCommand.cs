@@ -1,22 +1,20 @@
 ﻿using Ship.AI.Data;
+using Ship.Data;
 using Ship.OrdersManagement;
 using UnityEngine;
 
 namespace Ship.AI.Order
 {
-    public class SteeringOrders : IShipOrder
+    public class KeepCourseCommand : IShipOrder
     {
+      
+        private readonly Vector3 _targetDirection;
 
-        public static IShipOrder KeepCourse(Vector3 direction) => new SteeringOrders(direction);
-        
-        
-
-        private Vector3 _targetDirection;
-
-        private SteeringOrders(Vector3 targetDirection)
+        public KeepCourseCommand(Vector3 targetDirection)
         {
             this._targetDirection = targetDirection;
         }
+
         public ShipOrderCategory Category => ShipOrderCategory.Steer;
 
         public bool Execute(ShipBody ship)
@@ -40,8 +38,22 @@ namespace Ship.AI.Order
             deltaAngle = Mathf.Clamp(deltaAngle, -45, 45);
 
             //TODO simulate update
-            context.Self.Steering.Angle = (int)deltaAngle;
+            context.Self.Configuration.Steering.Angle = (int)deltaAngle;
             return false;
+        }
+
+        public void ApplyTo(ref ShipConfiguration configuration)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ShipCommandEstimation Estimate(ShipConfiguration configuration)
+        {
+            return new ShipCommandEstimation()
+            {
+                Seconds = 1,
+                CrewUnits = 1
+            };
         }
     }
 }

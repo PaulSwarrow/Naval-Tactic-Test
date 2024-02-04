@@ -1,10 +1,10 @@
-﻿namespace Ship.AI.CommandsGraphSearch
+﻿using System.Collections.Generic;
+
+namespace Ship.AI.CommandsGraphSearch
 {
     public struct ManeuverEdge
     {
-        
-        //in seconds?
-        public int Cost;
-        public ManeuverNode Destination;
+        public IShipOrder Order;
+
     }
 }

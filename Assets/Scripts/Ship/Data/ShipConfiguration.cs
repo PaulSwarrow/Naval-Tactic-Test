@@ -2,18 +2,10 @@
 
 namespace Ship.Data
 {
-    [Serializable]
-    public class ShipConfiguration
+    public struct ShipConfiguration
     {
-        [Serializable]
-        public class SailConfig
-        {
-            public SailType Type;
-            public int[] Angles;
-            public int Count;
-        }
-        
-        public ShipConfiguration[] Sails;
+        public ShipRigState Rigging;
+        public ShipSteeringState Steering;
 
     }
 }

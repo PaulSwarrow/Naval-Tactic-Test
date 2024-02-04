@@ -1,5 +1,6 @@
 ﻿using Ship.AI.Data;
 using Ship.AI.Order;
+using Ship.OrdersManagement;
 using UnityEngine;
 
 namespace Ship.AI.Maneuvers
@@ -21,7 +22,7 @@ namespace Ship.AI.Maneuvers
             var deltaAngle = Vector3.SignedAngle(context.Self.PhysicsData.Forward, _direction, Vector3.up);
             //CheckPoint(context, result, deltaAngle);
             TurnTo(_direction, context, result);
-            CheckPoint(context, result, SteeringOrders.KeepCourse(_direction));
+            CheckPoint(context, result, ShipCommands.KeepCourse(_direction));
             //DO orders
             FastForward(8, context);
             CheckPoint(context, result);

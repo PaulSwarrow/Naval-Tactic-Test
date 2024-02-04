@@ -51,8 +51,12 @@ namespace Ship
             var self = transform;
             var wind = _windSystem.GetWind(self.position); //assumption that wind doesn't change during time!
             var physicsData = GetPhysicsData();
-            
-            var forces = ShipPhysics.CalculateForces(physicsData, _steering, rigState, wind);
+            var configuration = new ShipConfiguration()
+            {
+                Rigging = rigState,
+                Steering = _steering
+            };
+            var forces = ShipPhysics.CalculateForces(physicsData, configuration, wind);
             var deceleration = ShipPhysics.CalculateHullDrag(physicsData);
             
             //add linear force
@@ -117,10 +121,16 @@ namespace Ship
         }
 
         //TODO 
-        public void SetupSail(SailType type, int value, int angle)
+        public void SetupSail(SailType type, int value)
         {
             var sail = rigState[type];
             sail.Setup = value;
+            rigState[type] = sail;
+        }
+        //TODO 
+        public void TurnSail(SailType type, int angle)
+        {
+            var sail = rigState[type];
             sail.Angle = angle;
             rigState[type] = sail;
         }
