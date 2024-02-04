@@ -2,7 +2,7 @@
 
 namespace Ship.AI.CommandsGraphSearch
 {
-    public class PathData<TNode, TEdge> : List<(TNode node, TEdge edge)>
+    public class PathData<TElement> : List<TElement>
     {
         
     }

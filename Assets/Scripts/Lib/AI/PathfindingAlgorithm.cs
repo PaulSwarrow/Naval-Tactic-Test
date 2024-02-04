@@ -4,7 +4,7 @@ using DefaultNamespace.Utils.MissingNetClasses;
 
 namespace Ship.AI.CommandsGraphSearch
 {
-    public abstract class PathfindingAlgorithm<TNode, TEdge>
+    public abstract class PathfindingAlgorithm<TNode, TEdge, TPathElement>
     {
         protected struct EdgeInfo
         {
@@ -13,7 +13,7 @@ namespace Ship.AI.CommandsGraphSearch
             public int Cost;
         }
         
-        protected PathData<TNode, TEdge> FindBest(TNode start, Func<TNode, int> estimator)
+        protected PathData<TPathElement> FindBest(TNode start, Func<TNode, int> estimator)
         {
             var frontier = new SimplePriorityQueue<TNode>();
             frontier.Enqueue(start, 0);
@@ -56,7 +56,7 @@ namespace Ship.AI.CommandsGraphSearch
             return ReconstructPath(cameFrom, start, bestNode);
         }
         
-        protected PathData<TNode, TEdge> FindPathTo(TNode start, Predicate<TNode> isDestination, Func<TNode, int, int> heuristic)
+        protected PathData<TPathElement> FindPathTo(TNode start, Predicate<TNode> isDestination, Func<TNode, int, int> heuristic)
         {
             var frontier = new SimplePriorityQueue<TNode>();
             frontier.Enqueue(start, 0);
@@ -95,21 +95,22 @@ namespace Ship.AI.CommandsGraphSearch
         // Function to get neighbors; adapt to your needs
         protected abstract List<EdgeInfo> GetEdges(TNode node);
 
-        private PathData<TNode, TEdge> ReconstructPath(Dictionary<TNode, (TNode node, TEdge edge)> cameFrom, TNode start, TNode end)
+        private PathData<TPathElement> ReconstructPath(Dictionary<TNode, (TNode node, TEdge edge)> cameFrom, TNode start, TNode end)
         {
-            PathData<TNode, TEdge> path = new ();
+            PathData<TPathElement> path = new ();
             (TNode node, TEdge edge) current = (end, default);
             while (!current.node.Equals(start))
             {
-                path.Add(current);
+                path.Add(CreatePathElement(current.node, current.edge));
                 current = cameFrom[current.node];
             }
-            path.Add(current);
+            path.Add(CreatePathElement(current.node, current.edge));
             path.Reverse();
             return path;
         }
 
-        
-        
+        protected abstract TPathElement CreatePathElement(TNode origin, TEdge step);
+
+
     }
 }

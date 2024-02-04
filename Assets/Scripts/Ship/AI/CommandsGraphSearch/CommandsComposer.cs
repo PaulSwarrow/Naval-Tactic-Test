@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Ship.AI.CommandsGraphSearch
 {
-    public class CommandsComposer : PathfindingAlgorithm<ManeuverNode, ManeuverEdge>
+    public class CommandsComposer : PathfindingAlgorithm<ManeuverNode, ManeuverEdge, ManeuverEdge>
     {
         private readonly int[] SteeringAngles = new[] { 0, 45, 90, -45, -90 };
 
@@ -16,27 +16,27 @@ namespace Ship.AI.CommandsGraphSearch
         public IWindProvider WindProvider;
 
 
-        public PathData<ManeuverNode, ManeuverEdge> Turn(ManeuverContext context, RotationDirection direction)
+        public PathData<ManeuverEdge> Turn(ManeuverContext context, RotationDirection direction)
         {
             var start = CreateInitialNode(context);
             return FindBest(start,
                 (node) => direction == RotationDirection.Right ? node.AngularForce : -node.AngularForce);
         }
 
-        public PathData<ManeuverNode, ManeuverEdge> StopRotation(ManeuverContext context)
+        public PathData<ManeuverEdge> StopRotation(ManeuverContext context)
         {
             var start = CreateInitialNode(context);
             return FindBest(start,
                 node => int.MaxValue - Mathf.Abs(node.AngularForce));
         }
 
-        public PathData<ManeuverNode, ManeuverEdge> FullForward(ManeuverContext context)
+        public PathData<ManeuverEdge> FullForward(ManeuverContext context)
         {
             var start = CreateInitialNode(context);
             return FindBest(start, node => node.LinearForce - Mathf.Abs(node.AngularForce));
         }
 
-        public PathData<ManeuverNode, ManeuverEdge> FullStop(ManeuverContext context)
+        public PathData<ManeuverEdge> FullStop(ManeuverContext context)
         {
             var start = CreateInitialNode(context);
             return FindBest(start, node => int.MaxValue - Mathf.Abs(node.LinearForce));
@@ -97,6 +97,11 @@ namespace Ship.AI.CommandsGraphSearch
             }
 
             return edges;
+        }
+
+        protected override ManeuverEdge CreatePathElement(ManeuverNode origin, ManeuverEdge step)
+        {
+            return step;
         }
 
         private ManeuverNode CreateInitialNode(ManeuverContext context)
