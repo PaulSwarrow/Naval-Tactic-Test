@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using Ship.AI.Data;
-using Ship.AI.Order;
+using Ship.Data;
 using Ship.Interfaces;
 using Ship.OrdersManagement;
+using UnityEngine;
 
 namespace Ship.AI.CommandsGraphSearch
 {
@@ -13,12 +14,34 @@ namespace Ship.AI.CommandsGraphSearch
         public ShipPhysicsData ShipData;
         public IShipSetup Setup;
         public IWindProvider WindProvider;
-        
-        
 
-        protected override int Heuristic(ManeuverNode node, int totalCost)
+
+        public PathData<ManeuverNode, ManeuverEdge> Turn(ManeuverContext context, RotationDirection direction)
         {
+            var start = CreateInitialNode(context);
+            return FindBest(start,
+                (node) => direction == RotationDirection.Right ? node.AngularForce : -node.AngularForce);
         }
+
+        public PathData<ManeuverNode, ManeuverEdge> StopRotation(ManeuverContext context)
+        {
+            var start = CreateInitialNode(context);
+            return FindBest(start,
+                node => int.MaxValue - Mathf.Abs(node.AngularForce));
+        }
+
+        public PathData<ManeuverNode, ManeuverEdge> FullForward(ManeuverContext context)
+        {
+            var start = CreateInitialNode(context);
+            return FindBest(start, node => node.LinearForce - Mathf.Abs(node.AngularForce));
+        }
+
+        public PathData<ManeuverNode, ManeuverEdge> FullStop(ManeuverContext context)
+        {
+            var start = CreateInitialNode(context);
+            return FindBest(start, node => int.MaxValue - Mathf.Abs(node.LinearForce));
+        }
+
 
         protected override List<EdgeInfo> GetEdges(ManeuverNode node)
         {
@@ -32,7 +55,6 @@ namespace Ship.AI.CommandsGraphSearch
                 {
                     if (angle != state.Angle && state.Setup == 0)
                     {
-                        
                         entry = new EdgeInfo();
                         entry.Edge = new ManeuverEdge();
                         entry.Edge.Order = ShipCommands.SailTurn(type, angle);
@@ -48,7 +70,7 @@ namespace Ship.AI.CommandsGraphSearch
                     {
                         var nextState = state;
                         nextState.Setup = setup;
-                        
+
                         entry = new EdgeInfo();
                         entry.Edge = new ManeuverEdge();
                         entry.Edge.Order = ShipCommands.SailSetup(type, setup);
@@ -59,7 +81,7 @@ namespace Ship.AI.CommandsGraphSearch
                 }
             });
 
-            
+
             foreach (var angle in SteeringAngles)
             {
                 var entry = new EdgeInfo()
@@ -72,10 +94,21 @@ namespace Ship.AI.CommandsGraphSearch
                 entry.Destination = GetEdgeDestination(node, entry.Edge);
                 entry.Cost = GetGeneralCost(node, entry.Edge);
                 edges.Add(entry);
-
             }
 
             return edges;
+        }
+
+        private ManeuverNode CreateInitialNode(ManeuverContext context)
+        {
+            var wind = WindProvider.GetWind(ShipData.Position);
+            var forces = ShipPhysics.CalculateForces(ShipData, context.Self.Configuration, wind);
+            return new ManeuverNode()
+            {
+                LinearForce = (int)forces.linear.z,
+                AngularForce = (int)forces.angular.y,
+                Configuration = context.Self.Configuration
+            };
         }
 
         private int GetGeneralCost(ManeuverNode node, ManeuverEdge edge)
@@ -83,7 +116,7 @@ namespace Ship.AI.CommandsGraphSearch
             var estimation = edge.Order.Estimate(node.Configuration);
             return estimation.Seconds + (estimation.CrewUnits * estimation.Risk);
         }
-        
+
 
         private ManeuverNode GetEdgeDestination(ManeuverNode node, ManeuverEdge edge)
         {
@@ -94,10 +127,6 @@ namespace Ship.AI.CommandsGraphSearch
             destination.LinearForce = (int)forces.linear.z;
             destination.AngularForce = (int)forces.angular.y;
             return destination;
-        }
-
-        protected override bool IsDestination(ManeuverNode node)
-        {
         }
     }
 }

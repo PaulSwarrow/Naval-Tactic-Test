@@ -83,8 +83,11 @@ namespace Ship
             return new AIPredictionShipData()
             {
                 PhysicsData = GetPhysicsData(),
-                RigState = rigState,
-                Steering = _steering,
+                Configuration = new ShipConfiguration()
+                {
+                    Rigging = rigState,
+                    Steering = _steering
+                }
             };
         }
         public ShipPhysicsData GetPhysicsData()
