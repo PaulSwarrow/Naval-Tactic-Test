@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Linq;
-using DefaultNamespace.GameSystems;
 using Ship.AI.CommandsGraphSearch;
 using Ship.AI.Data;
-using Ship.AI.Order;
 using Ship.Data;
 using UnityEngine;
 
@@ -12,6 +9,7 @@ namespace Ship.AI
     public abstract class BaseShipManeuver
     {
         private CommandsComposer _commandsComposer;
+
         public ManeuverPrediction Calculate(ManeuverContext context)
         {
             var result = new ManeuverPrediction();
@@ -20,7 +18,6 @@ namespace Ship.AI
         }
 
         protected abstract void DoCalculation(ManeuverContext context, ManeuverPrediction result);
-
 
         protected void CheckPoint(ManeuverContext context, ManeuverPrediction result, params IShipOrder[] orders)
         {
@@ -40,7 +37,8 @@ namespace Ship.AI
             while (Mathf.Abs(deltaAngle) > 1 && context.Time - t < 50)
             {
                 //commands composer should work with current "target" configuration, not factual - to prevent same from giving same orders repeatedly
-                var commands = _commandsComposer.Turn(context, deltaAngle > 0 ? RotationDirection.Right : RotationDirection.Left);
+                var commands = _commandsComposer.Turn(context,
+                    deltaAngle > 0 ? RotationDirection.Right : RotationDirection.Left);
                 CheckPoint(context, result, commands.ToArray());
                 FastForward(1, context);
                 deltaAngle = course - context.Ship.PhysicsData.Rotation.eulerAngles.y;
@@ -49,7 +47,7 @@ namespace Ship.AI
             var stopCommands = _commandsComposer.StopRotation(context);
             CheckPoint(context, result, stopCommands.ToArray());
         }
-        
+
         protected void FastForward(float seconds, ManeuverContext context, Func<bool> stopCondition = null)
         {
             var deltaTime = Time.fixedDeltaTime; //performance concern
@@ -60,7 +58,7 @@ namespace Ship.AI
             {
                 var wind = context.Wind.GetWind(body.Position); //assumption that wind doesn't change during time!
                 var forces = ShipPhysics.CalculateForces(body, context.Ship.Configuration, wind);
-                
+
                 var deceleration = ShipPhysics.CalculateHullDrag(body);
                 // Calculate the acceleration due to drag force
                 Vector3 acceleration = (forces.linear - body.Velocity * body.Drag) / body.Mass + deceleration;
@@ -91,9 +89,9 @@ namespace Ship.AI
                 {
                     var order = context.ActiveOrders[i];
                     var completed = order.Simulate(context, deltaTime);
-                    if(completed) context.ActiveOrders.RemoveAt(i);
+                    if (completed) context.ActiveOrders.RemoveAt(i);
                 }
-                
+
                 if (stopCondition != null && stopCondition()) return;
             }
         }
