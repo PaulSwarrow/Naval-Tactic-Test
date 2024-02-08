@@ -1,6 +1,7 @@
 ﻿using DefaultNamespace.GameSystems;
 using Ship.AI.Data;
 using Ship.Data;
+using Ship.Dummies;
 using Ship.View;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -68,12 +69,13 @@ namespace Ship
             
             _body.MovePosition(newPosition);
             _velocity = _velocity + acceleration * t;
-            //_body.AddForce();
             
-            //add angular force manually
-            Vector3 angularAcceleration = (forces.angular - _angularVelocity * _body.angularDrag) / _body.inertiaTensor.magnitude;
-            Vector3 averageAngularVelocity = _angularVelocity + angularAcceleration * (t / 2);
-            _angularVelocity = _angularVelocity + angularAcceleration * t;
+            
+            Vector3 angularAcceleration = (forces.angular) / _body.inertiaTensor.magnitude;
+            Vector3 angularDeceleration = -_angularVelocity * _body.angularDrag;
+            Vector3 averageAngularVelocity = _angularVelocity + (angularAcceleration + angularDeceleration) * (t / 2);
+            _angularVelocity += (angularAcceleration + angularDeceleration) * t;
+            //Debug.Log($"A: {angularAcceleration.y}, D: {angularDeceleration.y}, V: {_angularVelocity.y}");
             Quaternion rotationChange = Quaternion.Euler(averageAngularVelocity * t);
             _body.MoveRotation(_body.rotation * rotationChange);
         }

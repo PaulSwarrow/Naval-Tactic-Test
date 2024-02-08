@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Ship.AI.Data;
 using Ship.Data;
-using Ship.Interfaces;
 using Ship.OrdersManagement;
 using UnityEngine;
 
@@ -123,8 +122,8 @@ namespace Ship.AI.CommandsGraphSearch
             var destination = node;
             edge.Order.ApplyTo(ref destination.Configuration);
             var forces = ShipPhysics.CalculateForces(context.Ship.PhysicsData, destination.Configuration, wind);
-            destination.LinearForce = (int)forces.linear.z;
-            destination.AngularForce = (int)forces.angular.y;
+            destination.LinearForce = (int)(forces.linear.z * 1000);
+            destination.AngularForce = (int)(forces.angular.y * 1000);
             return destination;
         }
     }

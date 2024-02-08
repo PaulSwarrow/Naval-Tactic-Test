@@ -576,7 +576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _direction: 0
-  _force: 0.61
+  _force: 1
 --- !u!114 &1323299845
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -843,7 +843,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _steering.Angle
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _steering.Efficiency
@@ -863,7 +863,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: rigState.GafSail.Setup
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _rigData.FrontJib.Angle
@@ -891,7 +891,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: rigState.MainSail.Setup
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1896901436980444582, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: _rigData.MiddleSail.Setup
@@ -927,11 +927,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4721816719458978259, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: m_Mass
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4721816719458978259, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: m_AngularDrag
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4721816719458978259, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: m_Constraints
@@ -940,6 +940,14 @@ PrefabInstance:
     - target: {fileID: 7879792814437991883, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: m_RootOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7879792814437991883, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.99999994
+      objectReference: {fileID: 0}
+    - target: {fileID: 7879792814437991883, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.99999994
       objectReference: {fileID: 0}
     - target: {fileID: 7879792814437991883, guid: c51bb1a8953981747a4394d43a43e47c, type: 3}
       propertyPath: m_LocalPosition.x

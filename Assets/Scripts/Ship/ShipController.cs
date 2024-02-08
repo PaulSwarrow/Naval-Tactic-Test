@@ -8,18 +8,22 @@ using Ship.AI.Data;
 using Ship.AI.Maneuvers;
 using Ship.AI.Order;
 using Ship.Data;
+using Ship.Dummies;
 using Ship.OrdersManagement;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Zenject;
 
 namespace Ship
 {
     public class ShipController : MonoBehaviour
     {
+        [FormerlySerializedAs("angle")] [SerializeField] private float course;
         [Inject] private WindSystem _windSystem;
 
         
+        private DummyShipSetup _shipSetupDummy = new();
 
         private ShipOrdersList _activeOrders = new ();
         private ShipBody _body;
@@ -33,7 +37,7 @@ namespace Ship
 
         private void Start()
         {
-            //TEST().Forget();
+            TEST().Forget();
         }
 
         private void Update()
@@ -47,14 +51,17 @@ namespace Ship
 
 
         private async UniTask TEST()
-        { 
+        {
             var context = new ManeuverContext()
             {
                 Ship = _body.ExportToAI(),
-                Wind = _windSystem
+                Wind = _windSystem,
+                ShipSetup = _shipSetupDummy
             };
-            var maneuver = new TakeCourseManeuver(Vector3.forward);
+            var maneuver = new TakeCourseManeuver(Quaternion.Euler(0, course, 0) *Vector3.forward);
+            await UniTask.SwitchToThreadPool();
             _prediction = maneuver.Calculate(context);
+            await UniTask.SwitchToMainThread();
             await ExecuteManeuver(_prediction);
             Debug.Log("Maneuver Complete");
         }

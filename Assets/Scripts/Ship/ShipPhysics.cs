@@ -7,10 +7,10 @@ namespace Ship
 {
     public static class ShipPhysics
     {
+        private static float GlobalWindMultiplier = 0.01f;
         public static (Vector3 linear, Vector3 angular) CalculateForces(ShipPhysicsData physics, ShipConfiguration configuration, Vector3 wind)
         {
             var shipDirection = physics.Rotation * Vector3.forward;
-            var right = physics.Rotation * Vector3.right;
             var velocity = physics.Velocity;
             var totalForce = Vector3.zero;
             var relativeWind = Quaternion.Euler(0, -physics.Rotation.eulerAngles.y, 0) * wind;
@@ -19,25 +19,27 @@ namespace Ship
             
             configuration.Rigging.ForeachSail((type, sail) =>
             {
-                var vector = Quaternion.Euler(0, sail.Angle, 0) * shipDirection;
-                var force = vector * (sail.GetInput(relativeWind) * sail.Setup);
+                var vector = Quaternion.Euler(0, sail.Angle, 0) * Vector3.forward;
+                var dot = Vector3.Dot(vector, relativeWind);
+                var force = vector.normalized * (dot* sail.Setup);
                 totalForce += force;
-                var forceRight = Vector3.Dot(force, right);
-                if (type == SailType.FrontJib) steeringForce += forceRight * 50;
+                var forceRight = Vector3.Dot(force, Vector3.right);
+                if (type == SailType.FrontJib)
+                {
+                    steeringForce += forceRight * 50;
+                }
                 if (type == SailType.Gaf) steeringForce -= forceRight * 50;
             });
             
-            
-            var forceForward = shipDirection * (Vector3.Dot(totalForce, shipDirection));
+            var forceForward = Vector3.forward * Vector3.Dot(totalForce, shipDirection);
             //var forceRight = right * (Vector3.Dot(force, right) * 0.25f);
             //force = forceForward + forceRight;
             totalForce = forceForward;//no side shifting at all - simplifies AI
             
-            steeringForce +=Vector3.Dot(shipDirection, velocity) * configuration.Steering.Angle * 50;
+            steeringForce += Vector3.Dot(shipDirection, velocity) * configuration.Steering.Angle * 50;
             var angularForce = new Vector3(0, steeringForce , 0);
-            
 
-            return (linear: totalForce, angular: angularForce);
+            return (linear: totalForce * GlobalWindMultiplier, angular: angularForce * GlobalWindMultiplier);
         }
 
         public static Vector3 CalculateHullDrag(ShipPhysicsData physics)

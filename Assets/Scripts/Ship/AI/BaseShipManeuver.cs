@@ -8,7 +8,7 @@ namespace Ship.AI
 {
     public abstract class BaseShipManeuver
     {
-        private CommandsComposer _commandsComposer;
+        private CommandsComposer _commandsComposer = new ();
 
         public ManeuverPrediction Calculate(ManeuverContext context)
         {
@@ -60,22 +60,16 @@ namespace Ship.AI
                 var forces = ShipPhysics.CalculateForces(body, context.Ship.Configuration, wind);
 
                 var deceleration = ShipPhysics.CalculateHullDrag(body);
-                // Calculate the acceleration due to drag force
                 Vector3 acceleration = (forces.linear - body.Velocity * body.Drag) / body.Mass + deceleration;
-                // Calculate the new velocity after timeToPredict
                 Vector3 newVelocity = body.Velocity + acceleration * deltaTime;
-                // Calculate the new position after timeToPredict
                 var averageSpeed = body.Velocity + acceleration * deltaTime / 2;
                 Vector3 newPosition = body.Position + averageSpeed * deltaTime;
-
-                // Calculate the angular acceleration due to angular force
-                Vector3 angularAcceleration =
-                    (forces.angular - body.AngularVelocity * body.AngularDrag) / body.InertiaTensor;
-                // Calculate the average angular velocity over the time interval
-                Vector3 averageAngularVelocity = body.AngularVelocity + angularAcceleration * (deltaTime / 2);
-                // Update the angular velocity using angular acceleration
-                var newAngularVelocity = body.AngularVelocity + angularAcceleration * deltaTime;
-                // Calculate the new rotation based on the average angular velocity
+                
+                
+                Vector3 angularAcceleration = forces.angular / body.InertiaTensor;
+                Vector3 angularDeceleration = -body.AngularVelocity * body.AngularDrag;
+                Vector3 averageAngularVelocity = body.AngularVelocity + (angularAcceleration + angularDeceleration) * (deltaTime / 2);
+                var newAngularVelocity = body.AngularVelocity + (angularAcceleration + angularDeceleration) * deltaTime;
                 Quaternion newRotation = body.Rotation * Quaternion.Euler(averageAngularVelocity * deltaTime);
 
                 // Update Context
