@@ -37,8 +37,7 @@ namespace Ship.AI
             while (Mathf.Abs(deltaAngle) > 1 && context.Time - t < 50)
             {
                 //commands composer should work with current "target" configuration, not factual - to prevent same from giving same orders repeatedly
-                var commands = _commandsComposer.Turn(context,
-                    deltaAngle > 0 ? RotationDirection.Right : RotationDirection.Left);
+                var commands = _commandsComposer.Turn(context, deltaAngle);
                 CheckPoint(context, result, commands.ToArray());
                 FastForward(1, context);
                 deltaAngle = course - context.Ship.PhysicsData.Rotation.eulerAngles.y;

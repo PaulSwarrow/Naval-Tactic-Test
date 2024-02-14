@@ -27,16 +27,6 @@ namespace Ship.Data
         public ShipSailState GafSail;
 
 
-        public void ForeachSail(SailHandler handler)
-        {
-            //TODO check existence
-            handler.Invoke(SailType.FrontJib, FrontJib);
-            handler.Invoke(SailType.MiddleJib, MiddleJib);
-            handler.Invoke(SailType.MainSail, MainSail);
-            handler.Invoke(SailType.MiddleSail, MiddleSail);
-            handler.Invoke(SailType.MizzenSail, MizzenSail);
-            handler.Invoke(SailType.Gaf, GafSail);
-        }
 
         public ShipSailState this[SailType key]
         {
@@ -94,5 +84,20 @@ namespace Ship.Data
     public struct ShipSteeringState
     {
         public int Angle;
+    }
+
+    public static class SailsHelper
+    {
+        
+        public static void ForeachSail(this ShipRigState state, ShipRigState.SailHandler handler)
+        {
+            //TODO check existence
+            handler.Invoke(SailType.FrontJib, state.FrontJib);
+            handler.Invoke(SailType.MiddleJib, state.MiddleJib);
+            handler.Invoke(SailType.MainSail, state.MainSail);
+            handler.Invoke(SailType.MiddleSail, state.MiddleSail);
+            handler.Invoke(SailType.MizzenSail, state.MizzenSail);
+            handler.Invoke(SailType.Gaf, state.GafSail);
+        }
     }
 }

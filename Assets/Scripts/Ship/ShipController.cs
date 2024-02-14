@@ -7,6 +7,7 @@ using Ship.AI;
 using Ship.AI.Data;
 using Ship.AI.Maneuvers;
 using Ship.AI.Order;
+using Ship.AI.SailSchemantics;
 using Ship.Data;
 using Ship.Dummies;
 using Ship.OrdersManagement;
@@ -52,6 +53,10 @@ namespace Ship
 
         private async UniTask TEST()
         {
+            var schemeBuilder = new RigSchemeBuilder();
+            schemeBuilder.BuildScheme(_shipSetupDummy);
+            
+            return;
             var context = new ManeuverContext()
             {
                 Ship = _body.ExportToAI(),

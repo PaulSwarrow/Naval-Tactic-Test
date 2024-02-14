@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Ship.AI.Data;
+using Ship.AI.SailSchemantics;
 using Ship.Data;
 using Ship.OrdersManagement;
+using Ship.Utils;
+using Sirenix.Utilities.Editor;
 using UnityEngine;
 
 namespace Ship.AI.CommandsGraphSearch
@@ -10,18 +14,43 @@ namespace Ship.AI.CommandsGraphSearch
     {
         private readonly int[] _steeringAngles = new[] { 0, 45, 90, -45, -90 };
 
-        public PathData<IShipOrder> Turn(ManeuverContext context, RotationDirection direction)
+        private Dictionary<SailType, SailScheme[]> _rigScheme = new();
+        public PathData<IShipOrder> Turn(ManeuverContext context, float deltaAngle)
         {
-            var start = CreateInitialNode(context);
-            return FindBest(start, context, 
-                (node) => direction == RotationDirection.Right ? node.AngularForce : -node.AngularForce);
+            PathData<IShipOrder> result = new();
+
+            var wind = context.Wind.GetWind(context.Ship.PhysicsData.Position);
+            var relativeWind = ShipPhysics.GetRelativeWind(context.Ship.PhysicsData.Rotation, wind);
+            var relativeWindCourse = ShipPhysics.DirectionToCourse(relativeWind);
+            
+            
+
+            return result;
+
         }
 
         public PathData<IShipOrder> StopRotation(ManeuverContext context)
-        {
-            var start = CreateInitialNode(context);
-            return FindBest(start, context,
-                node => int.MaxValue - Mathf.Abs(node.AngularForce));
+        {PathData<IShipOrder> result = new();
+
+            var wind = context.Wind.GetWind(context.Ship.PhysicsData.Position);
+            var relativeWind = ShipPhysics.GetRelativeWind(context.Ship.PhysicsData.Rotation, wind);
+            var relativeWindCourse = ShipPhysics.DirectionToCourse(relativeWind);
+            
+            SailType[] orderedSails = EnumTools.ToArray<SailType>();
+            foreach (var sailType in orderedSails)
+            {
+                var schemes = _rigScheme[sailType].First(s =>
+                {
+                    var info = s.GetInfo(relativeWindCourse);
+                    //TODO more complex formula here!
+                    return info.TorqueFactor == 0;
+
+                });
+                
+                result.AddRange(schemes.OrdersToSet(context.Ship.Configuration.Rigging));
+            }
+            
+            return result;
         }
 
         public PathData<IShipOrder> FullForward(ManeuverContext context)
