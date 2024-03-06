@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.Ship.AI.SailSchematics;
 using Cysharp.Threading.Tasks;
 using DefaultNamespace.GameSystems;
 using Ship.AI;
 using Ship.AI.Data;
 using Ship.AI.Maneuvers;
 using Ship.AI.Order;
-using Ship.AI.SailSchemantics;
 using Ship.Data;
 using Ship.Dummies;
 using Ship.OrdersManagement;

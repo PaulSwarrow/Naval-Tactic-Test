@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ship.AI.SailSchemantics;
+using Assets.Scripts.Ship.AI.SailSchematics;
 using Ship.Data;
 using Ship.Interfaces;
 using Ship.Utils;
